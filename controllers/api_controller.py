@@ -25,4 +25,25 @@ def create_api_blueprint(svc):
                         "profile": clustering.hourly_profile(d),
                         "summary": clustering.summary(),
                         "silhouette": clustering.silhouette})
+    
+    prediction = svc["prediction"]
+
+    @bp.route("/train_prediction", methods=["GET", "POST"])
+    def train_prediction():
+        try:
+            return jsonify({"ok": True, "metrics": prediction.train()})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+    @bp.get("/prediction_status")
+    def prediction_status():
+        return jsonify(prediction.status())
+
+    @bp.get("/predict")
+    def predict():
+        h, d = _slot()
+        c = clustering.get_cluster(h, d)
+        return jsonify({"hora": h, "dia": d, "cluster": c, "cluster_label": clustering.label(c),
+                        "vehicles": round(prediction.predict(h, d, c), 1),
+                        "model": prediction.best_model or "historical average"})
     return bp
