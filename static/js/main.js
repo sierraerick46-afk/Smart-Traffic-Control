@@ -68,3 +68,39 @@ async function initDashboard() {
 document.addEventListener("DOMContentLoaded", () => {
   if ($("cluster-card")) initDashboard().catch(console.error);
 });
+
+function renderMetrics(m) {
+  const names = { random_forest: "Random Forest", mlp: "MLP (PyTorch)" };
+  $("metrics-table").innerHTML = ["random_forest", "mlp"].map((k) => {
+    const x = m[k], best = m.best_model === k;
+    return `<tr class="${best ? "table-success" : ""}"><td>${names[k]}${best ? " ✓" : ""}</td>
+      <td class="text-end">${x.mse}</td><td class="text-end">${x.mae}</td>
+      <td class="text-end">${x.r2}</td><td class="text-end">${x.train_seconds}s</td></tr>`;
+  }).join("");
+}
+
+async function loadPredict() {
+  const d = await api(`/api/predict?${slot()}`);
+  $("pred-value").textContent = `${d.vehicles} veh/h`;
+  $("pred-model").textContent = `model: ${d.model}`;
+}
+
+async function trainPrediction() {
+  const btn = $("btn-train-pred");
+  btn.disabled = true; $("spin-pred").classList.remove("d-none");
+  setMsg($("pred-msg"), "Training Random Forest and MLP in parallel…");
+  try {
+    const r = await api("/api/train_prediction", { method: "POST" });
+    renderMetrics(r.metrics);
+    setMsg($("pred-msg"), `Done: ${r.metrics.n_train} training samples, ${r.metrics.n_test} test samples.`, "success");
+    await loadPredict();
+  } catch (e) { setMsg($("pred-msg"), e.message, "danger"); }
+  btn.disabled = false; $("spin-pred").classList.add("d-none");
+}
+
+initHooks.push(async () => {
+  $("btn-train-pred").onclick = trainPrediction;
+  const s = await api("/api/prediction_status");
+  if (s.metrics) renderMetrics(s.metrics);
+});
+slotHooks.push(loadPredict);
