@@ -26,6 +26,7 @@ class DataLoader:
         self.is_synthetic = False
         self._data = None
 
+    @staticmethod
     def _read_csv(path):
         last = None
         for enc in ("utf-8-sig", "latin-1"):
