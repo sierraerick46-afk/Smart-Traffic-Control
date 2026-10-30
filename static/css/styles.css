@@ -1,0 +1,19 @@
+:root { --ink:#1d252b; --asphalt:#2b3238; --paper:#f3f4f1; --line:#dcdfd9;
+        --go:#2e9e5b; --wait:#e0a526; --stop:#d64545; }
+body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper); color:var(--ink); }
+.app-nav { background:var(--asphalt); }
+.app-nav .navbar-brand, .app-nav .nav-link { color:#e8ebe6; }
+.app-nav .nav-link.active { color:#fff; border-bottom:2px solid var(--wait); }
+.card { border:1px solid var(--line); border-radius:6px; box-shadow:none; }
+.card-header { background:#fff; font-weight:600; border-bottom:1px solid var(--line); }
+.table { --bs-table-bg:transparent; }
+
+.hour-strip { display:grid; grid-template-columns:repeat(24,1fr); gap:2px; }
+.hour-cell { height:34px; border-radius:3px; font-size:.62rem; display:flex; align-items:flex-end;
+             justify-content:center; color:#fff; padding-bottom:2px; opacity:.85; cursor:pointer; }
+.hour-cell.c-success { background:var(--go); }
+.hour-cell.c-warning { background:var(--wait); color:#3a2c00; }
+.hour-cell.c-danger  { background:var(--stop); }
+.hour-cell.c-info    { background:#3a8fb7; }
+.hour-cell.c-primary { background:#4a63c9; }
+.hour-cell.sel { opacity:1; outline:2px solid var(--ink); outline-offset:1px; }
