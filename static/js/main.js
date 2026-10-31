@@ -104,3 +104,89 @@ initHooks.push(async () => {
   if (s.metrics) renderMetrics(s.metrics);
 });
 slotHooks.push(loadPredict);
+function renderEval(ev) {
+  const row = (name, x) => `<tr><td>${name}</td><td class="text-end">${x.avg_queue}</td>
+    <td class="text-end">${x.throughput}</td><td class="text-end">${x.overflow}</td></tr>`;
+  $("eval-table").innerHTML = row("DQN agent", ev.dqn) + row("Fixed time (30 s)", ev.fixed) +
+    `<tr class="table-light"><td colspan="4" class="small">Queue reduction vs. fixed time: <strong>${ev.improvement_pct}%</strong></td></tr>`;
+}
+
+async function trainControl() {
+  const btn = $("btn-train-ctrl");
+  btn.disabled = true; $("spin-ctrl").classList.remove("d-none");
+  setMsg($("ctrl-msg"), "Training the agent in the simulator…");
+  try {
+    const r = await post("/api/train_control", { episodes: parseInt($("episodes").value, 10) || 60 });
+    setMsg($("ctrl-msg"), `Reward per episode: ${r.report.reward_first} → ${r.report.reward_last}`, "success");
+    renderEval(r.report.evaluation);
+  } catch (e) { setMsg($("ctrl-msg"), e.message, "danger"); }
+  btn.disabled = false; $("spin-ctrl").classList.add("d-none");
+}
+
+initHooks.push(() => { $("btn-train-ctrl").onclick = trainControl; });
+
+
+let timer = null, busy = false;
+
+function buildAccess(i) {
+  $(`acc-${i}`).innerHTML = `<div class="name" id="n-${i}"></div>
+    <div class="signal red" id="sig-${i}"><span class="lamp lamp-r"></span><span class="lamp lamp-y"></span><span class="lamp lamp-g"></span></div>
+    <div class="queue-bar"><div class="queue-fill" id="qf-${i}"></div></div>
+    <div class="small"><span id="qn-${i}">0</span> vehicles</div>
+    <div class="cars" id="cars-${i}"></div>`;
+}
+
+function renderSim(d) {
+  for (let i = 0; i < 4; i++) {
+    $(`n-${i}`).textContent = d.access_names[i];
+    $(`sig-${i}`).className = `signal ${d.signals[i]}`;
+    const q = d.queues[i], pct = (100 * q) / d.queue_cap;
+    const f = $(`qf-${i}`);
+    f.style.width = pct + "%";
+    f.className = "queue-fill" + (pct > 65 ? " high" : pct > 35 ? " mid" : "");
+    $(`qn-${i}`).textContent = q;
+    $(`cars-${i}`).innerHTML = '<span class="car"></span>'.repeat(Math.min(q, 24));
+  }
+  $("phase-name").textContent = `Green: ${d.phase_name}`;
+  $("m-time").textContent = `${d.day_name} ${String(d.sim_hour).padStart(2, "0")}:00`;
+  const c = $("m-cluster"); c.className = `badge text-bg-${d.cluster_color}`; c.textContent = d.cluster_label;
+  $("m-pred").textContent = d.predicted;
+  $("m-action").textContent = d.action_name;
+  $("m-green").textContent = d.yellow ? `${d.phase_name} (yellow)` : d.phase_name;
+  $("m-reward").textContent = d.reward;
+  $("m-tip").textContent = `${d.time_in_phase} s`;
+  $("bar-phase").style.width = Math.min(100, (100 * d.time_in_phase) / 60) + "%";
+  $("m-next").textContent = `${d.seconds_to_next_hour} s`;
+  $("bar-hour").style.width = (100 * (60 - d.seconds_to_next_hour)) / 60 + "%";
+  $("m-total").textContent = d.total_queue;
+  $("m-avg").textContent = d.avg_queue;
+  $("m-dep").textContent = d.departed_total;
+  const p = $("sim-policy"); p.className = `badge text-bg-${d.trained ? "success" : "warning"}`; p.textContent = d.policy;
+}
+
+async function tick() {
+  if (busy) return;                      
+  busy = true;
+  try { renderSim(await api("/api/simulation_step")); } catch (e) { console.error(e); }
+  busy = false;
+}
+
+function setRunning(on) {
+  $("btn-start").disabled = on; $("btn-pause").disabled = !on;
+  if (on) { tick(); timer = setInterval(tick, 1000); } else { clearInterval(timer); timer = null; }
+}
+
+function initSimulation() {
+  for (let i = 0; i < 4; i++) buildAccess(i);
+  $("btn-start").onclick = () => setRunning(true);
+  $("btn-pause").onclick = () => setRunning(false);
+  $("btn-reset").onclick = async () => {
+    setRunning(false); await post("/api/simulation_reset");
+    ["m-total", "m-avg", "m-dep"].forEach((id) => ($(id).textContent = "0"));
+    for (let i = 0; i < 4; i++) { $(`qf-${i}`).style.width = "0%"; $(`qn-${i}`).textContent = "0"; $(`cars-${i}`).innerHTML = ""; $(`sig-${i}`).className = "signal red"; }
+  };
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if ($("sim-page")) initSimulation();
+});
