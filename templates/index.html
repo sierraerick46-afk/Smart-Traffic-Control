@@ -77,6 +77,34 @@
       </div>
     </div>
   </div>
+
+  <div class="col-12" id="control-card">
+      <div class="card">
+        <div class="card-header">3 · Decide: keep or change the green?</div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <p class="small text-secondary">The DQN agent learns by trial and error in the intersection simulator and is compared with a fixed-time signal (30 s).</p>
+              <div class="d-flex align-items-end gap-2 mb-3">
+                <div><label class="form-label small mb-1" for="episodes">Episodes</label>
+                  <input id="episodes" type="number" min="5" max="300" value="60" class="form-control form-control-sm" style="width:100px"></div>
+                <button id="btn-train-ctrl" class="btn btn-dark btn-sm">Train agent</button>
+                <a href="/simula" class="btn btn-outline-dark btn-sm">View simulation</a>
+                <span id="spin-ctrl" class="spinner-border spinner-border-sm d-none"></span>
+              </div>
+              <div id="ctrl-msg" class="small"></div>
+            </div>
+            <div class="col-lg-7">
+              <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>Policy</th><th class="text-end">Avg. queue (veh.)</th><th class="text-end">Vehicles served</th><th class="text-end">Vehicles lost</th></tr></thead>
+                <tbody id="eval-table"><tr><td colspan="4" class="text-secondary">Train the agent to see the comparison.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -46,4 +46,24 @@ def create_api_blueprint(svc):
         return jsonify({"hora": h, "dia": d, "cluster": c, "cluster_label": clustering.label(c),
                         "vehicles": round(prediction.predict(h, d, c), 1),
                         "model": prediction.best_model or "historical average"})
+        
+    control = svc["control"]
+
+    @bp.route("/train_control", methods=["POST"])
+    def train_control():
+        body = request.get_json(silent=True) or {}
+        episodes = max(5, min(int(body.get("episodes", 60)), 300))
+        try:
+            return jsonify({"ok": True, "report": control.train(episodes=episodes)})
+        except Exception as e:  # noqa: BLE001
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+    @bp.get("/simulation_step")
+    def simulation_step():
+        return jsonify(control.simulation_step())
+
+    @bp.post("/simulation_reset")
+    def simulation_reset():
+        control.reset_live()
+        return jsonify({"ok": True})
     return bp

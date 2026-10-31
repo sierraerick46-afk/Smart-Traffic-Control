@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulation · Chía Traffic Lights</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg app-nav">
+  <div class="container">
+    <a class="navbar-brand" href="/">Chía Traffic Lights</a>
+    <div class="navbar-nav ms-auto flex-row gap-3">
+      <a class="nav-link" href="/">Home</a>
+      <a class="nav-link" href="/dashboard">Dashboard</a>
+      <a class="nav-link active" href="/simula">Simulation</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4" id="sim-page">
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <h1 class="h4 mb-0 me-auto">Intersection monitor</h1>
+    <span id="sim-policy" class="badge text-bg-secondary">Stopped</span>
+    <button id="btn-start" class="btn btn-dark btn-sm">Start</button>
+    <button id="btn-pause" class="btn btn-outline-dark btn-sm" disabled>Pause</button>
+    <button id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card"><div class="card-body">
+        <div class="intersection">
+          
+          <div class="acc acc-n" id="acc-0"></div>
+          <div class="acc acc-w" id="acc-3"></div>
+          <div class="crossing"><div id="phase-name" class="small text-secondary text-center">Phase –</div></div>
+          <div class="acc acc-e" id="acc-2"></div>
+          <div class="acc acc-s" id="acc-1"></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card mb-3"><div class="card-body">
+        <div class="row g-3">
+          <div class="col-6"><div class="small text-secondary">Simulated time</div>
+            <div id="m-time" class="fw-semibold">–</div></div>
+          <div class="col-6"><div class="small text-secondary">Traffic group</div>
+            <span id="m-cluster" class="badge text-bg-secondary">–</span></div>
+          <div class="col-6"><div class="small text-secondary">Forecast (veh/h)</div>
+            <div id="m-pred" class="fw-semibold">–</div></div>
+          <div class="col-6"><div class="small text-secondary">Agent decision</div>
+            <div id="m-action" class="fw-semibold">–</div></div>
+          <div class="col-6"><div class="small text-secondary">Current green</div>
+            <div id="m-green" class="fw-semibold">–</div></div>
+          <div class="col-6"><div class="small text-secondary">Reward</div>
+            <div id="m-reward" class="fw-semibold">–</div></div>
+        </div>
+      </div></div>
+
+      <div class="card"><div class="card-body">
+        <div class="d-flex justify-content-between small"><span>Time in current phase</span><span id="m-tip">0 s</span></div>
+        <div class="progress mb-3" style="height:10px"><div id="bar-phase" class="progress-bar bg-dark" style="width:0%"></div></div>
+        <div class="d-flex justify-content-between small"><span>Next simulated hour in</span><span id="m-next">–</span></div>
+        <div class="progress mb-3" style="height:10px"><div id="bar-hour" class="progress-bar bg-secondary" style="width:0%"></div></div>
+        <div class="row text-center">
+          <div class="col-4"><div class="small text-secondary">Total queue</div><div id="m-total" class="fs-5 fw-semibold">0</div></div>
+          <div class="col-4"><div class="small text-secondary">Avg. queue</div><div id="m-avg" class="fs-5 fw-semibold">0</div></div>
+          <div class="col-4"><div class="small text-secondary">Served</div><div id="m-dep" class="fs-5 fw-semibold">0</div></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+  <p class="small text-secondary mt-3">If the agent is not trained yet, the simulation uses a fixed-time signal. Train it from the <a href="/dashboard">dashboard</a>.</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
