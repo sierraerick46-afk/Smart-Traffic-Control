@@ -8,7 +8,11 @@ def create_web_blueprint():
         return render_template("index.html")
     
     @bp.route("/simula")
-        def simula():
-            return render_template("simula.html")
+    def simula():
+         return render_template("simula.html")
+
+    @bp.route("/")
+    def home():
+        return render_template("home.html")
 
     return bp
