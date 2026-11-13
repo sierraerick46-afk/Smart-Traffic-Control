@@ -49,12 +49,12 @@ PHASES = [
         "tables": [
             {
                 "caption": "Average demand per intersection",
-                "head": ["Junction", "Intersection", "Records", "Mean veh/h", "Max veh/h"],
+                "head": ["Junction", "Intersection", "Records", "Mean veh/h", "P95 veh/h"],
                 "rows": [
-                    ["1", "Cra 9 con Av. Chilacos", "14,592", "45.1", "156"],
-                    ["2", "Av. Pradilla con Cra 5", "14,592", "14.3", "48"],
-                    ["3", "Calle 11 con Cra 7", "14,592", "13.7", "180"],
-                    ["4", "Cra 10 con Calle 7", "4,344", "7.3", "36"],
+                    ["1", "Av. Pradilla con Cra 3", "14,592", "45.1", "89"],
+                    ["2", "Cra 9 con Calle 10", "14,592", "14.3", "30"],
+                    ["3", "Calle 21 (Av. Chilacos) con Cra 9", "14,592", "13.7", "30"],
+                    ["4", "Calle 11 con Cra 17", "4,344", "7.3", "13"],
                 ],
             }
         ],
