@@ -120,8 +120,8 @@ class DataLoader:
         traffic["ID"] = np.arange(len(traffic))
         inventory = pd.DataFrame({
             "ID": [f"CHIA-00{i}" for i in range(1, 5)],
-            "DIRECCION": ["Cra 9 con Av. Chilacos", "Av. Pradilla con Cra 5",
-                          "Calle 11 con Cra 7", "Cra 10 con Calle 7"],
+            "DIRECCION": ["Av. Pradilla con Cra 3", "Cra 9 con Calle 10",
+                          "Calle 21 (Av. Chilacos) con Cra 9", "Calle 11 con Cra 17"],
             "NUMEROFASES": [2, 2, 2, 2],
         })
         return inventory, traffic
