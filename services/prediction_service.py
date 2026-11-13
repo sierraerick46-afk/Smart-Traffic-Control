@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import torch
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from torch import nn
@@ -13,37 +13,43 @@ from models.network_mlp import TrafficMLP
 
 torch.set_num_threads(1)
 
+MODEL_LABELS = {"random_forest": "Random Forest", "gradient_boosting": "Gradient Boosting",
+                "mlp": "MLP (PyTorch)", "historical": "Historical average"}
+
 
 class PredictionService:
     def __init__(self, data_loader, clustering_service, seed=42, epochs=40, max_rows=60000):
         self.loader = data_loader
         self.clustering = clustering_service
         self.seed, self.epochs, self.max_rows = seed, epochs, max_rows
-        self.rf = None
-        self.mlp = None
-        self._mlp_params = None
+        self.models = {}
         self.metrics = None
         self.best_model = None
         self.version = 0
         self._baseline = None
         self._lock = threading.Lock()
 
-    @staticmethod
-    def make_features(hour, dow, cluster):
-        hour = np.atleast_1d(np.asarray(hour, dtype=float))
-        dow = np.atleast_1d(np.asarray(dow, dtype=float))
-        cluster = np.atleast_1d(np.asarray(cluster, dtype=float))
-        ang = 2 * np.pi * hour / 24
-        return np.column_stack([hour, dow, (dow >= 5).astype(float), cluster,
-                                np.sin(ang), np.cos(ang)]).astype(np.float32)
+    def _jindex(self, junctions):
+        m = {j: i for i, j in enumerate(self.clustering.junctions)}
+        return np.array([m.get(int(j), 0) for j in np.atleast_1d(junctions)])
+
+    def _features(self, hours, dows, clusters, junctions):
+        hours = np.atleast_1d(np.asarray(hours, dtype=float))
+        dows = np.atleast_1d(np.asarray(dows, dtype=float))
+        clusters = np.atleast_1d(np.asarray(clusters, dtype=float))
+        ang = 2 * np.pi * hours / 24
+        onehot = np.eye(len(self.clustering.junctions))[self._jindex(junctions)]
+        base = np.column_stack([hours, dows, (dows >= 5).astype(float), clusters,
+                                np.sin(ang), np.cos(ang)])
+        return np.hstack([base, onehot]).astype(np.float32)
 
     def _dataset(self):
         df = self.loader.get_data()
         if len(df) > self.max_rows:
             df = df.sample(self.max_rows, random_state=self.seed)
-        cl = self.clustering.cluster_array(df["hour"].values, df["dayofweek"].values)
-        return self.make_features(df["hour"].values, df["dayofweek"].values, cl), \
-            df["vehicles"].values.astype(np.float32)
+        h, d, j = df["hour"].values, df["dayofweek"].values, df["junction"].values
+        cl = self.clustering.cluster_array(h, d, j)
+        return self._features(h, d, cl, j), df["vehicles"].values.astype(np.float32)
 
     @staticmethod
     def _metrics(y, p, secs):
@@ -57,6 +63,12 @@ class PredictionService:
         rf = RandomForestRegressor(n_estimators=120, max_depth=14, min_samples_leaf=2,
                                    n_jobs=1, random_state=self.seed).fit(Xtr, ytr)
         return rf, self._metrics(yte, rf.predict(Xte), time.time() - t0)
+
+    def _train_gb(self, Xtr, ytr, Xte, yte):
+        t0 = time.time()
+        gb = HistGradientBoostingRegressor(max_iter=200, learning_rate=0.08, max_depth=8,
+                                           random_state=self.seed).fit(Xtr, ytr)
+        return gb, self._metrics(yte, gb.predict(Xte), time.time() - t0)
 
     def _mlp_forward(self, model, params, X):
         with torch.no_grad():
@@ -90,14 +102,15 @@ class PredictionService:
         with self._lock:
             X, y = self._dataset()
             Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=self.seed)
-            with ThreadPoolExecutor(max_workers=2) as ex:
-                f_rf = ex.submit(self._train_rf, Xtr, ytr, Xte, yte)
-                f_mlp = ex.submit(self._train_mlp, Xtr, ytr, Xte, yte)
-                rf, rf_m = f_rf.result()
-                (mlp, params), mlp_m = f_mlp.result()
-            self.rf, self.mlp, self._mlp_params = rf, mlp, params
-            self.best_model = "random_forest" if rf_m["mse"] <= mlp_m["mse"] else "mlp"
-            self.metrics = {"random_forest": rf_m, "mlp": mlp_m, "best_model": self.best_model,
+            jobs = {"random_forest": self._train_rf, "gradient_boosting": self._train_gb,
+                    "mlp": self._train_mlp}
+            with ThreadPoolExecutor(max_workers=3) as ex:
+                futures = {k: ex.submit(fn, Xtr, ytr, Xte, yte) for k, fn in jobs.items()}
+                results = {k: f.result() for k, f in futures.items()}
+            self.models = {k: r[0] for k, r in results.items()}
+            metrics = {k: r[1] for k, r in results.items()}
+            self.best_model = min(metrics, key=lambda k: metrics[k]["mse"])
+            self.metrics = {**metrics, "best_model": self.best_model,
                             "n_train": int(len(Xtr)), "n_test": int(len(Xte))}
             self.version += 1
             return self.metrics
@@ -105,30 +118,50 @@ class PredictionService:
     def _baseline_table(self):
         if self._baseline is None:
             df = self.loader.get_data()
-            t = df.groupby(["dayofweek", "hour"])["vehicles"].mean()
-            glob = float(df["vehicles"].mean())
-            self._baseline = np.array([[float(t.get((d, h), glob)) for h in range(24)]
-                                       for d in range(7)])
+            t = df.groupby(["junction", "dayofweek", "hour"])["vehicles"].mean()
+            tj = df.groupby("junction")["vehicles"].mean()
+            self._baseline = np.array([[[float(t.get((j, d, h), tj[j])) for h in range(24)]
+                                        for d in range(7)] for j in self.clustering.junctions])
         return self._baseline
 
-    def predict_many(self, hours, dows, clusters=None):
+    def resolved_name(self, model=None):
+        if model in self.models or model == "historical":
+            return model
+        return self.best_model or "historical"
+
+    def model_label(self, model=None):
+        return MODEL_LABELS[self.resolved_name(model)]
+
+    def models_info(self):
+        return [{"key": k, "label": MODEL_LABELS[k], "available": k in self.models}
+                for k in ("random_forest", "gradient_boosting", "mlp")]
+
+    def _predict_with(self, name, X):
+        m = self.models[name]
+        if name == "mlp":
+            return self._mlp_forward(m[0], m[1], X)
+        return m.predict(X)
+
+    def predict_many(self, hours, dows, clusters=None, junctions=None, model=None):
         hours, dows = np.asarray(hours, int), np.asarray(dows, int)
+        if junctions is None:
+            return np.mean([self.predict_many(hours, dows, None, np.full(len(hours), j), model)
+                            for j in self.clustering.junctions], axis=0)
+        junctions = np.atleast_1d(np.asarray(junctions, int))
         if clusters is None:
-            clusters = self.clustering.cluster_array(hours, dows)
-        if self.best_model is None:
-            out = self._baseline_table()[dows % 7, hours % 24]
+            clusters = self.clustering.cluster_array(hours, dows, junctions)
+        name = self.resolved_name(model)
+        if name == "historical":
+            out = self._baseline_table()[self._jindex(junctions), dows % 7, hours % 24]
         else:
-            X = self.make_features(hours, dows, clusters)
-            if self.best_model == "random_forest":
-                out = self.rf.predict(X)
-            else:
-                out = self._mlp_forward(self.mlp, self._mlp_params, X)
+            out = self._predict_with(name, self._features(hours, dows, clusters, junctions))
         return np.clip(out, 0, None)
 
-    def predict(self, hora, dia, cluster=None):
-        c = None if cluster is None else [cluster]
-        return float(self.predict_many([hora], [dia], c)[0])
+    def predict(self, hora, dia, cluster=None, junction=None, model=None):
+        c = None if (cluster is None or junction is None) else [cluster]
+        j = None if junction is None else [junction]
+        return float(self.predict_many([hora], [dia], c, j, model)[0])
 
     def status(self):
         return {"trained": self.best_model is not None, "best_model": self.best_model,
-                "metrics": self.metrics}
+                "metrics": self.metrics, "models": self.models_info()}

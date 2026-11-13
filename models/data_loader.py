@@ -11,7 +11,6 @@ DIAS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sun
 
 
 def now_bogota():
-    """Hora actual de Colombia (UTC-5, sin horario de verano)."""
     return datetime.now(timezone(timedelta(hours=-5)))
 
 
@@ -25,6 +24,7 @@ class DataLoader:
         self.raw_dir = raw_dir
         self.is_synthetic = False
         self._data = None
+        self._lookup = None
 
     @staticmethod
     def _read_csv(path):
@@ -53,7 +53,8 @@ class DataLoader:
             if {"DATETIME", "VEHICLES"} <= cols:
                 traffic = df
             elif cols & {"DIRECCION", "NUMEROFASES"}:
-                inventory = df
+                if inventory is None or "chia" in name.lower():
+                    inventory = df
         return inventory, traffic
 
     @staticmethod
@@ -90,8 +91,8 @@ class DataLoader:
 
         traffic = traffic.copy()
         if "ID" in traffic.columns and np.isin(traffic["ID"], inv_ids).any():
-            traffic["ID_INTERSECCION"] = traffic["ID"]      
-        else:                                              
+            traffic["ID_INTERSECCION"] = traffic["ID"]
+        else:
             order = sorted(traffic["JUNCTION"].unique())
             mapping = {j: inv_ids[i % len(inv_ids)] for i, j in enumerate(order)}
             traffic["ID_INTERSECCION"] = traffic["JUNCTION"].map(mapping)
@@ -119,8 +120,8 @@ class DataLoader:
         traffic["ID"] = np.arange(len(traffic))
         inventory = pd.DataFrame({
             "ID": [f"CHIA-00{i}" for i in range(1, 5)],
-            "DIRECCION": ["Cra 9 con Calle 11", "Av. Pradilla con Cra 7",
-                          "Cra 2 con Calle 15", "Calle 7 con Cra 10"],
+            "DIRECCION": ["Cra 9 con Av. Chilacos", "Av. Pradilla con Cra 5",
+                          "Calle 11 con Cra 7", "Cra 10 con Calle 7"],
             "NUMEROFASES": [2, 2, 2, 2],
         })
         return inventory, traffic
@@ -140,6 +141,32 @@ class DataLoader:
                                             "VEHICLES": "vehicles"})
             self._data = merged
         return self._data
+
+    def intersections(self):
+        df = self.get_data()
+        out = []
+        for j, g in df.groupby("junction"):
+            try:
+                phases = int(float(g["NUMEROFASES"].iloc[0]))
+            except (TypeError, ValueError):
+                phases = 2
+            out.append({"junction": int(j), "id": str(g["ID_INTERSECCION"].iloc[0]),
+                        "address": str(g["DIRECCION"].iloc[0]), "phases": phases,
+                        "records": int(len(g)), "avg_vehicles": round(float(g["vehicles"].mean()), 1),
+                        "p95": float(g["vehicles"].quantile(0.95))})
+        return out
+
+    def date_bounds(self):
+        df = self.get_data()
+        return df["datetime"].min().strftime("%Y-%m-%d"), df["datetime"].max().strftime("%Y-%m-%d")
+
+    def observed(self, junction, date_str, hour):
+        if self._lookup is None:
+            df = self.get_data()
+            days = df["datetime"].dt.strftime("%Y-%m-%d")
+            self._lookup = {(int(j), d, int(h)): float(v)
+                            for j, d, h, v in zip(df["junction"], days, df["hour"], df["vehicles"])}
+        return self._lookup.get((int(junction), date_str, int(hour)))
 
     def summary(self):
         df = self.get_data()
