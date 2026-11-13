@@ -9,16 +9,7 @@
   <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg app-nav">
-  <div class="container">
-    <a class="navbar-brand" href="/">Chía Traffic Lights</a>
-    <div class="navbar-nav ms-auto flex-row gap-3">
-      <a class="nav-link" href="/">Home</a>
-      <a class="nav-link active" href="/dashboard">Dashboard</a>
-      <a class="nav-link" href="/simula">Simulation</a>
-    </div>
-  </div>
-</nav>
+{% with active = "dashboard" %}{% include "_nav.html" %}{% endwith %}
 
 <main class="container py-4">
   <header class="mb-4">
@@ -33,6 +24,8 @@
       <select id="sel-dia" class="form-select form-select-sm"></select></div>
     <div><label class="form-label small mb-1" for="sel-hora">Hour</label>
       <select id="sel-hora" class="form-select form-select-sm"></select></div>
+    <div><label class="form-label small mb-1" for="sel-junction">Intersection</label>
+      <select id="sel-junction" class="form-select form-select-sm"></select></div>
     <div class="text-secondary small ms-auto">Colombia time on load; change it to explore other moments.</div>
   </div></div>
 
@@ -60,7 +53,7 @@
       <div class="card h-100">
         <div class="card-header">2 · Predict: how much congestion is coming?</div>
         <div class="card-body">
-          <p class="small text-secondary">Trains a Random Forest and an MLP (PyTorch) on the same data and compares them with the same metrics.</p>
+          <p class="small text-secondary">Trains three models (Random Forest, Gradient Boosting and an MLP in PyTorch) on the same data and compares them with the same metrics.</p>
           <button id="btn-train-pred" class="btn btn-dark btn-sm mb-3">Train and compare</button>
           <span id="spin-pred" class="spinner-border spinner-border-sm ms-2 d-none"></span>
           <div id="pred-msg" class="small mb-2"></div>
@@ -69,7 +62,7 @@
             <tbody id="metrics-table"><tr><td colspan="5" class="text-secondary">Not trained yet.</td></tr></tbody>
           </table>
           <div class="p-3 rounded bg-body-tertiary">
-            <div class="small text-secondary">Expected vehicles for the selected moment</div>
+            <div class="small text-secondary">Expected vehicles for the selected moment and intersection</div>
             <div><span id="pred-value" class="fs-3 fw-semibold">–</span>
                  <span id="pred-model" class="small text-secondary ms-2"></span></div>
           </div>

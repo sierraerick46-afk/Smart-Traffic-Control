@@ -1,0 +1,61 @@
+{% with page_title = "Phase " ~ phase.num ~ " · " ~ phase.title %}{% include "_crisp_head.html" %}{% endwith %}
+
+<header class="crisp-hero" style="--phase:{{ phase.color }}">
+  <div class="container">
+    <span class="hero-kicker">CRISP-ML · Phase {{ phase.num }} of {{ crisp_phases | length }}</span>
+    <h1>{{ phase.title }}</h1>
+    <p class="lead mb-4">{{ phase.summary }}</p>
+    <ol class="crisp-steps" aria-label="CRISP-ML phases">
+      {% for p in crisp_phases %}
+      <li class="{% if p.num == phase.num %}current{% elif p.num < phase.num %}done{% endif %}">
+        <a href="/crisp-ml/{{ p.num }}" title="Phase {{ p.num }} · {{ p.title }}"{% if p.num == phase.num %} aria-current="page"{% endif %}>{{ p.num }}</a>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</header>
+
+<main class="container py-5">
+  <p class="crisp-intro">{{ phase.intro }}</p>
+
+  <div class="row gx-3 gy-3 mt-1">
+    {% for item in phase["items"] %}
+    <div class="col-md-6">
+      <article class="crisp-item" style="--phase:{{ phase.color }}">
+        <h2>{{ item.name }}</h2>
+        <p class="crisp-method"><span>Methodology</span>{{ item.method }}</p>
+        <p class="crisp-label">In this project</p>
+        <ul>
+          {% for a in item.applied %}<li>{{ a | safe }}</li>{% endfor %}
+        </ul>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% for t in phase.tables %}
+  <section class="mt-5">
+    <h2 class="h5 mb-3">{{ t.caption }}</h2>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle crisp-table">
+        <thead><tr>{% for h in t.head %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+        <tbody>
+          {% for row in t.rows %}<tr>{% for c in row %}<td>{{ c }}</td>{% endfor %}</tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+
+  <div class="callout mt-4">{{ phase.note }}</div>
+
+  <nav class="crisp-pager mt-5" aria-label="Phase navigation">
+    {% if prev_p %}<a href="/crisp-ml/{{ prev_p.num }}"><small>← Previous</small>Phase {{ prev_p.num }} · {{ prev_p.title }}</a>{% else %}<a href="/crisp-ml"><small>← Back</small>CRISP-ML overview</a>{% endif %}
+    {% if next_p %}<a class="text-end" href="/crisp-ml/{{ next_p.num }}"><small>Next →</small>Phase {{ next_p.num }} · {{ next_p.title }}</a>{% else %}<a class="text-end" href="/dashboard"><small>Next →</small>Open the dashboard</a>{% endif %}
+  </nav>
+
+  {% include "_crisp_refs.html" %}
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
