@@ -84,11 +84,11 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
       flex-direction:column; align-items:center; gap:14px; box-shadow:0 12px 32px rgba(0,0,0,.35); }
 .tl-lamp { width:60px; height:60px; border-radius:50%; opacity:.16; }
 .tl-r { background:var(--stop); animation:on-red 9s infinite; }
-.tl-y { background:var(--wait); animation:on-yellow 9s infinite; }
+.tl-y { background:#fffb00; animation:on-yellow 9s infinite; }
 .tl-g { background:var(--go); animation:on-green 9s infinite; }
 @keyframes on-red    { 0%,38% { opacity:1; box-shadow:0 0 28px var(--stop); } 40%,100% { opacity:.16; box-shadow:none; } }
 @keyframes on-green  { 0%,40% { opacity:.16; box-shadow:none; } 42%,78% { opacity:1; box-shadow:0 0 28px var(--go); } 80%,100% { opacity:.16; box-shadow:none; } }
-@keyframes on-yellow { 0%,80% { opacity:.16; box-shadow:none; } 82%,97% { opacity:1; box-shadow:0 0 28px var(--wait); } 100% { opacity:.16; box-shadow:none; } }
+@keyframes on-yellow { 0%,80% { opacity:.16; box-shadow:none; } 82%,97% { opacity:1; box-shadow:0 0 28px #fffb00; } 100% { opacity:.16; box-shadow:none; } }
 @media (prefers-reduced-motion:reduce) {
 .tl-lamp { animation:none; } .tl-g { opacity:1; box-shadow:0 0 28px var(--go); }
 }
@@ -120,8 +120,8 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
 .gantt .lbl { font-size:.9rem; font-weight:600; line-height:1.15; }
 .gantt .lbl span { display:block; font-weight:400; font-size:.75rem; color:#5c666d; }
 .g-cell { height:26px; border-radius:4px; background:#eceee9; }
-.g-1 { background:var(--go); } .g-2 { background:#3a8fb7; } .g-3 { background:var(--wait); }
-.g-4 { background:#fbfcfd; } .g-5 { background:var(--asphalt); }
+.g-cell.g-1 { background:var(--go); } .g-cell.g-2 { background:#3a8fb7; } .g-cell.g-3 { background:#e0a526; }
+.g-cell.g-4 { background:#4a63c9; } .g-cell.g-5 { background:var(--asphalt); }
 .refs { padding-left:1.6rem; margin:0; }
 .refs li { margin-bottom:.7rem; padding-left:.2rem; }
 .home-footer { color:#5c666d; font-size:.85rem; }
