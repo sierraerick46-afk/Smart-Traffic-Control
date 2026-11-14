@@ -1,0 +1,25 @@
+family,model,params,cv_rmse_mean,cv_rmse_std,cv_mae_mean,cv_r2_mean,seconds
+seasonal_mean,Seasonal mean (baseline),{},12.678,4.589,8.894,0.5063,0.3
+ridge,Ridge regression,"{""alpha"": 0.1}",12.427,5.517,8.882,0.5135,0.3
+ridge,Ridge regression,"{""alpha"": 1.0}",12.426,5.517,8.882,0.5135,0.4
+ridge,Ridge regression,"{""alpha"": 10.0}",12.427,5.516,8.881,0.5135,0.3
+random_forest,Random Forest,"{""n_estimators"": 100, ""max_depth"": 12, ""min_samples_leaf"": 1}",10.718,5.503,7.422,0.6376,7.1
+random_forest,Random Forest,"{""n_estimators"": 100, ""max_depth"": 12, ""min_samples_leaf"": 3}",10.38,5.712,7.103,0.6527,9.0
+random_forest,Random Forest,"{""n_estimators"": 100, ""max_depth"": 20, ""min_samples_leaf"": 1}",10.761,5.515,7.489,0.6348,12.4
+random_forest,Random Forest,"{""n_estimators"": 100, ""max_depth"": 20, ""min_samples_leaf"": 3}",10.411,5.734,7.154,0.6505,9.8
+random_forest,Random Forest,"{""n_estimators"": 200, ""max_depth"": 12, ""min_samples_leaf"": 1}",10.74,5.503,7.434,0.6365,15.2
+random_forest,Random Forest,"{""n_estimators"": 200, ""max_depth"": 12, ""min_samples_leaf"": 3}",10.39,5.721,7.107,0.6522,14.0
+random_forest,Random Forest,"{""n_estimators"": 200, ""max_depth"": 20, ""min_samples_leaf"": 1}",10.778,5.529,7.502,0.6337,20.0
+random_forest,Random Forest,"{""n_estimators"": 200, ""max_depth"": 20, ""min_samples_leaf"": 3}",10.422,5.747,7.162,0.65,16.7
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.05, ""max_depth"": 6, ""max_iter"": 200}",10.283,6.545,6.828,0.6494,3.3
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.05, ""max_depth"": 6, ""max_iter"": 400}",10.28,6.495,6.859,0.65,6.3
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.05, ""max_depth"": 10, ""max_iter"": 200}",10.253,6.572,6.835,0.6503,3.3
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.05, ""max_depth"": 10, ""max_iter"": 400}",10.239,6.526,6.844,0.6509,5.9
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.1, ""max_depth"": 6, ""max_iter"": 200}",10.329,6.643,6.853,0.6456,2.9
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.1, ""max_depth"": 6, ""max_iter"": 400}",10.398,6.651,6.976,0.6417,5.0
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.1, ""max_depth"": 10, ""max_iter"": 200}",10.217,6.533,6.854,0.653,2.8
+gradient_boosting,Gradient Boosting,"{""learning_rate"": 0.1, ""max_depth"": 10, ""max_iter"": 400}",10.209,6.488,6.914,0.6541,5.4
+mlp,MLP (PyTorch),"{""hidden"": [64, 32], ""lr"": 0.001}",12.019,7.299,7.897,0.5295,16.4
+mlp,MLP (PyTorch),"{""hidden"": [64, 32], ""lr"": 0.003}",13.333,7.685,8.93,0.4142,16.0
+mlp,MLP (PyTorch),"{""hidden"": [128, 64], ""lr"": 0.001}",13.442,9.147,9.364,0.3763,22.2
+mlp,MLP (PyTorch),"{""hidden"": [128, 64], ""lr"": 0.003}",16.54,8.71,11.953,0.0019,23.1

@@ -53,14 +53,17 @@
       <div class="card h-100">
         <div class="card-header">2 · Predict: how much congestion is coming?</div>
         <div class="card-body">
-          <p class="small text-secondary">Trains three models (Random Forest, Gradient Boosting and an MLP in PyTorch) on the same data and compares them with the same metrics.</p>
-          <button id="btn-train-pred" class="btn btn-dark btn-sm mb-3">Train and compare</button>
+          <p class="small text-secondary">Five models trained on the same time-ordered partitions: tuned with 5-fold time-series cross-validation, compared on the validation set (Mar–Apr 2017) and the winner checked once on the independent test set (May–Jun 2017).</p>
+          <button id="btn-train-pred" class="btn btn-dark btn-sm mb-3">Retrain and compare</button>
           <span id="spin-pred" class="spinner-border spinner-border-sm ms-2 d-none"></span>
           <div id="pred-msg" class="small mb-2"></div>
+          <div class="table-responsive">
           <table class="table table-sm align-middle">
-            <thead><tr><th>Model</th><th class="text-end">MSE</th><th class="text-end">MAE</th><th class="text-end">R²</th><th class="text-end">Time</th></tr></thead>
-            <tbody id="metrics-table"><tr><td colspan="5" class="text-secondary">Not trained yet.</td></tr></tbody>
+            <thead><tr><th>Model</th><th class="text-end">CV RMSE</th><th class="text-end">Val. MSE</th><th class="text-end">Val. MAE</th><th class="text-end">Val. R²</th></tr></thead>
+            <tbody id="metrics-table"><tr><td colspan="5" class="text-secondary">No saved results.</td></tr></tbody>
           </table>
+          </div>
+          <div id="test-result" class="small mb-3"></div>
           <div class="p-3 rounded bg-body-tertiary">
             <div class="small text-secondary">Expected vehicles for the selected moment and intersection</div>
             <div><span id="pred-value" class="fs-3 fw-semibold">–</span>

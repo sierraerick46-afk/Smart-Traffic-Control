@@ -16,42 +16,46 @@
 </header>
 
 <main class="container py-5">
-  <p class="crisp-intro">{{ phase.intro }}</p>
+  <p class="crisp-intro">{{ phase.intro | safe }}</p>
 
-  <div class="row gx-3 gy-3 mt-1">
-    {% for item in phase["items"] %}
-    <div class="col-md-6">
-      <article class="crisp-item" style="--phase:{{ phase.color }}">
-        <h2>{{ item.name }}</h2>
-        <p class="crisp-method"><span>Methodology</span>{{ item.method }}</p>
-        <p class="crisp-label">In this project</p>
-        <ul>
-          {% for a in item.applied %}<li>{{ a | safe }}</li>{% endfor %}
-        </ul>
-      </article>
-    </div>
-    {% endfor %}
-  </div>
+  <nav class="crisp-toc my-4" aria-label="Sections">
+    {% for sec in phase.sections %}<a href="#s{{ loop.index }}">{{ sec.title }}</a>{% endfor %}
+  </nav>
 
-  {% for t in phase.tables %}
-  <section class="mt-5">
-    <h2 class="h5 mb-3">{{ t.caption }}</h2>
-    <div class="table-responsive">
+  {% for sec in phase.sections %}
+  <section id="s{{ loop.index }}" class="crisp-section" style="--phase:{{ phase.color }}">
+    <h2>{{ sec.title }}</h2>
+    {% for p in sec.get("paragraphs", []) %}<p>{{ p | safe }}</p>{% endfor %}
+    {% if sec.get("bullets") %}<ul>{% for b in sec.bullets %}<li>{{ b | safe }}</li>{% endfor %}</ul>{% endif %}
+    {% for t in sec.get("tables", []) %}
+    <div class="table-responsive mt-3">
+      {% if t.caption %}<div class="small fw-semibold mb-1">{{ t.caption }}</div>{% endif %}
       <table class="table table-sm align-middle crisp-table">
         <thead><tr>{% for h in t.head %}<th>{{ h }}</th>{% endfor %}</tr></thead>
-        <tbody>
-          {% for row in t.rows %}<tr>{% for c in row %}<td>{{ c }}</td>{% endfor %}</tr>{% endfor %}
-        </tbody>
+        <tbody>{% for row in t.rows %}<tr{% if t.get("highlight") is not none and loop.index0 == t.highlight %} class="table-success"{% endif %}>{% for c in row %}<td>{{ c | safe }}</td>{% endfor %}</tr>{% endfor %}</tbody>
       </table>
     </div>
+    {% endfor %}
+    {% if sec.get("figures") %}
+    <div class="row gx-3 gy-3 mt-1">
+      {% for f in sec.figures %}
+      <div class="{{ 'col-lg-6' if sec.figures | length > 1 else 'col-lg-10' }}">
+        <figure class="crisp-fig">
+          <img src="{{ url_for('static', filename='img/crisp/' ~ f.file) }}" alt="{{ f.caption }}" loading="lazy">
+          <figcaption>{{ f.caption | safe }}</figcaption>
+        </figure>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if sec.get("code") %}<pre class="demo-code mt-3">{{ sec.code }}</pre>{% endif %}
+    {% if sec.get("note") %}<div class="callout mt-3">{{ sec.note | safe }}</div>{% endif %}
   </section>
   {% endfor %}
 
-  <div class="callout mt-4">{{ phase.note }}</div>
-
   <nav class="crisp-pager mt-5" aria-label="Phase navigation">
     {% if prev_p %}<a href="/crisp-ml/{{ prev_p.num }}"><small>← Previous</small>Phase {{ prev_p.num }} · {{ prev_p.title }}</a>{% else %}<a href="/crisp-ml"><small>← Back</small>CRISP-ML overview</a>{% endif %}
-    {% if next_p %}<a class="text-end" href="/crisp-ml/{{ next_p.num }}"><small>Next →</small>Phase {{ next_p.num }} · {{ next_p.title }}</a>{% else %}<a class="text-end" href="/dashboard"><small>Next →</small>Open the dashboard</a>{% endif %}
+    {% if next_p %}<a class="text-end" href="/crisp-ml/{{ next_p.num }}"><small>Next →</small>Phase {{ next_p.num }} · {{ next_p.title }}</a>{% else %}<a class="text-end" href="/demo"><small>Next →</small>Open the model demo</a>{% endif %}
   </nav>
 
   {% include "_crisp_refs.html" %}

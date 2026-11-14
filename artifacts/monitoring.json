@@ -1,0 +1,88 @@
+{
+ "label": "SIMULATED OPERATIONAL DATA",
+ "description": "Replay of the real hourly counts of May\u2013June 2017 (not used for training) as if they arrived day by day. From 2017-06-10 a synthetic +30% increase is injected at junction 1 to test the alerts.",
+ "generated_at": "2026-11-14T00:45:17",
+ "model": "Gradient Boosting",
+ "model_version": "20261114-0045",
+ "thresholds": {
+  "mae_7d": 8.45,
+  "psi": 0.25,
+  "reference_test_mae": 5.635
+ },
+ "days": 61,
+ "predictions_logged": 5856,
+ "warmup_days": 7,
+ "days_with_alerts": 55,
+ "first_retrain_alert_day": "2017-06-13",
+ "retrain_alert_days": 18,
+ "drift_warning_days_by_junction": {
+  "3": 34,
+  "1": 46,
+  "2": 41,
+  "4": 22
+ },
+ "mae_7d_before_drift": 5.1,
+ "mae_7d_last_week": 12.14,
+ "drift_injected": {
+  "from": "2017-06-10",
+  "junction": 1,
+  "factor": 1.3
+ },
+ "alerts_sample": [
+  {
+   "day": "2017-05-07",
+   "alerts": [
+    {
+     "level": "drift_warning",
+     "message": "Data drift at junction 3: PSI 0.265 > 0.25"
+    }
+   ]
+  },
+  {
+   "day": "2017-05-08",
+   "alerts": [
+    {
+     "level": "drift_warning",
+     "message": "Data drift at junction 3: PSI 0.36 > 0.25"
+    }
+   ]
+  },
+  {
+   "day": "2017-05-09",
+   "alerts": [
+    {
+     "level": "drift_warning",
+     "message": "Data drift at junction 3: PSI 0.559 > 0.25"
+    }
+   ]
+  },
+  {
+   "day": "2017-05-10",
+   "alerts": [
+    {
+     "level": "drift_warning",
+     "message": "Data drift at junction 3: PSI 0.468 > 0.25"
+    }
+   ]
+  },
+  {
+   "day": "2017-05-11",
+   "alerts": [
+    {
+     "level": "drift_warning",
+     "message": "Data drift at junction 3: PSI 0.662 > 0.25"
+    }
+   ]
+  },
+  {
+   "day": "2017-05-12",
+   "alerts": [
+    {
+     "level": "drift_warning",
+     "message": "Data drift at junction 3: PSI 0.922 > 0.25"
+    }
+   ]
+  }
+ ],
+ "log_file": "logs/monitoring_test.jsonl"
+}

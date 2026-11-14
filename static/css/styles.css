@@ -172,3 +172,22 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
 .crisp-pager a:hover { border-color:var(--ink); }
 .crisp-pager small { display:block; color:#7a857f; font-weight:400; }
 @media (max-width:576px) { .crisp-pager { grid-template-columns:1fr; } .app-nav .dropdown-menu { min-width:260px; } }
+.demo-curve { display:flex; align-items:flex-end; gap:3px; height:150px; padding:6px 0; border-bottom:1px solid var(--line); }
+.demo-curve .bar { flex:1; background:#a3c9b2; border-radius:3px 3px 0 0; }
+.demo-curve .bar.on { background:#00482b; }
+.demo-code { background:#1b2228; color:#e8ebe6; border-radius:8px; padding:.8rem 1rem; font-size:.85rem; white-space:pre-wrap; }
+.crisp-fig { background:#fff; border:1px solid var(--line); border-radius:8px; padding:.75rem; margin:0; }
+.crisp-fig img { width:100%; height:auto; display:block; }
+.crisp-fig figcaption { font-size:.85rem; color:#5d6862; margin-top:.5rem; }
+.sim-label { display:inline-block; background:#fdecea; color:#a12a2a; border:1px solid #f3b7b0; border-radius:6px; padding:.15rem .5rem; font-size:.78rem; font-weight:600; letter-spacing:.03em; }
+.crisp-toc { display:flex; flex-wrap:wrap; gap:8px; }
+.crisp-toc a { font-size:.85rem; border:1px solid var(--line); border-radius:999px; padding:.25rem .75rem; color:var(--ink); text-decoration:none; background:#fff; }
+.crisp-toc a:hover { border-color:var(--ink); }
+.crisp-section { --phase:var(--asphalt); background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.4rem 1.5rem; margin-top:1.25rem; scroll-margin-top:80px; }
+.crisp-section h2 { font-size:1.2rem; font-weight:600; margin-bottom:.75rem; }
+.crisp-section h2::before { content:""; display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--phase); margin-right:10px; vertical-align:2px; }
+.crisp-section ul { padding-left:1.2rem; margin-bottom:.5rem; }
+.crisp-section li { margin-bottom:.35rem; }
+.ov-stat { background:var(--paper, #f3f6f4); border-radius:8px; padding:.8rem 1rem; height:100%; }
+.ov-stat b { display:block; font-size:1.6rem; color:#00482b; line-height:1.1; }
+.ov-stat span { font-size:.82rem; color:#5d6862; }

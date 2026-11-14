@@ -1,7 +1,9 @@
 flask>=3.0
 gunicorn>=22.0
-pandas>=2.0
-numpy>=1.26
-scikit-learn>=1.4
+pandas>=2.2
+numpy>=2.0
+scikit-learn==1.9.1
+joblib>=1.4
+matplotlib>=3.8
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.2

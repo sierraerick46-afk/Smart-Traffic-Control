@@ -1,11 +1,12 @@
 from flask import Blueprint, abort, render_template
 
 from controllers.auth_controller import login_required
-from controllers.crisp_content import PHASES, REFERENCES, get_phase
+from controllers.crisp_content import PHASES, REFERENCES, build_phase, get_phase, load
 
 
-def create_web_blueprint():
+def create_web_blueprint(services):
     bp = Blueprint("web", __name__)
+    loader = services["loader"]
 
     @bp.app_context_processor
     def inject_crisp():
@@ -23,13 +24,13 @@ def create_web_blueprint():
 
     @bp.route("/crisp-ml")
     def crisp_overview():
-        return render_template("crisp_overview.html", active="crisp", references=REFERENCES)
+        return render_template("crisp_overview.html", active="crisp", references=REFERENCES, rep=load("report.json"))
 
     @bp.route("/crisp-ml/<int:num>")
     def crisp_phase(num):
-        phase = get_phase(num)
-        if phase is None:
+        if get_phase(num) is None:
             abort(404)
+        phase = build_phase(num, loader.intersections())
         prev_p = get_phase(num - 1)
         next_p = get_phase(num + 1)
         return render_template("crisp_phase.html", active="crisp", phase=phase,

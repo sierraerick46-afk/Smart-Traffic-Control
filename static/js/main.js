@@ -80,13 +80,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderMetrics(m) {
-  const names = { random_forest: "Random Forest", gradient_boosting: "Gradient Boosting", mlp: "MLP (PyTorch)" };
-  $("metrics-table").innerHTML = ["random_forest", "gradient_boosting", "mlp"].map((k) => {
-    const x = m[k], best = m.best_model === k;
-    return `<tr class="${best ? "table-success" : ""}"><td>${names[k]}${best ? " ✓" : ""}</td>
-      <td class="text-end">${x.mse}</td><td class="text-end">${x.mae}</td>
-      <td class="text-end">${x.r2}</td><td class="text-end">${x.train_seconds}s</td></tr>`;
+  if (!m || !m.rows) return;
+  $("metrics-table").innerHTML = m.rows.map((x) => {
+    const best = m.best_model === x.key;
+    return `<tr class="${best ? "table-success" : ""}"><td>${x.label}${best ? " ✓" : ""}</td>
+      <td class="text-end">${x.cv_rmse ?? "–"}</td><td class="text-end">${x.mse}</td>
+      <td class="text-end">${x.mae}</td><td class="text-end">${x.r2}</td></tr>`;
   }).join("");
+  const t = m.test;
+  $("test-result").innerHTML = t ? `<b>Independent test (May–Jun 2017) · ${m.test_label}:</b> R² ${t.r2} · MAE ${t.mae} veh/h · RMSE ${t.rmse}
+    <span class="text-secondary">(${m.source === "saved" ? "saved model" : "retrained now"}; train ${m.n_train.toLocaleString()} · validation ${m.n_validation.toLocaleString()} · test ${m.n_test.toLocaleString()} rows)</span>` : "";
 }
 
 async function loadPredict() {
@@ -98,11 +101,17 @@ async function loadPredict() {
 async function trainPrediction() {
   const btn = $("btn-train-pred");
   btn.disabled = true; $("spin-pred").classList.remove("d-none");
-  setMsg($("pred-msg"), "Training Random Forest, Gradient Boosting and MLP in parallel…");
+  setMsg($("pred-msg"), "Retraining the five models with the tuned parameters… this can take a few minutes.");
   try {
-    const r = await api("/api/train_prediction", { method: "POST" });
-    renderMetrics(r.metrics);
-    setMsg($("pred-msg"), `Done: ${r.metrics.n_train} training samples, ${r.metrics.n_test} test samples.`, "success");
+    await api("/api/train_prediction", { method: "POST" });
+    let s;
+    do {
+      await new Promise((r) => setTimeout(r, 3000));
+      s = await api("/api/prediction_status");
+    } while (s.training);
+    if (s.error) throw new Error(s.error);
+    renderMetrics(s.metrics);
+    setMsg($("pred-msg"), "Done: models retrained with the same partitions and parameters.", "success");
     await loadPredict();
   } catch (e) { setMsg($("pred-msg"), e.message, "danger"); }
   btn.disabled = false; $("spin-pred").classList.add("d-none");

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model demo · Chía Traffic Lights</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+{% include "_nav.html" %}
+
+<header class="crisp-hero" style="--phase:#4a63c9">
+  <div class="container">
+    <span class="hero-kicker">CRISP-ML · Phase 5 · Deployment</span>
+    <h1>Forecast demo</h1>
+    <p class="lead mb-0">Enter a date, an hour and an intersection. The saved model ({{ model_label }}, version {{ version }}) returns the expected vehicles per hour.</p>
+  </div>
+</header>
+
+<main class="container py-5">
+  <div class="row gx-4 gy-4">
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header">Inputs</div>
+        <div class="card-body">
+          <form id="f-demo" class="row gx-3 gy-3">
+            <div class="col-7"><label class="form-label small" for="d-date">Date</label>
+              <input class="form-control" type="date" id="d-date" value="2017-06-12" required></div>
+            <div class="col-5"><label class="form-label small" for="d-hour">Hour</label>
+              <select class="form-select" id="d-hour">{% for h in range(24) %}<option value="{{ h }}"{% if h == 8 %} selected{% endif %}>{{ '%02d' % h }}:00</option>{% endfor %}</select></div>
+            <div class="col-12"><label class="form-label small" for="d-junction">Intersection</label>
+              <select class="form-select" id="d-junction">{% for j, a in intersections.items() %}<option value="{{ j }}">{{ j }} · {{ a }}</option>{% endfor %}</select></div>
+            <div class="col-12"><button class="btn btn-dark w-100" type="submit">Predict</button></div>
+          </form>
+          <div id="d-error" class="alert alert-danger small mt-3 d-none" role="alert"></div>
+        </div>
+      </div>
+      <div class="small text-secondary mt-3">Model trained on {{ trained_on }}. Independent test (May–Jun 2017): R² {{ test.get('r2', '–') }}, MAE {{ test.get('mae', '–') }} vehicles per hour.</div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-header">Output</div>
+        <div class="card-body">
+          <div id="d-empty" class="text-secondary">Press Predict to see the forecast.</div>
+          <div id="d-result" class="d-none">
+            <div class="d-flex flex-wrap align-items-baseline gap-3">
+              <span id="r-value" class="display-6 fw-semibold"></span>
+              <span id="r-group" class="badge"></span>
+            </div>
+            <div id="r-meta" class="small text-secondary mt-1"></div>
+            <div id="r-notes" class="small mt-2"></div>
+            <div class="small text-secondary mt-4 mb-1">Forecast for the 24 hours of that day</div>
+            <div id="r-curve" class="demo-curve" aria-label="Hourly forecast"></div>
+            <div class="d-flex justify-content-between small text-secondary"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-5">
+    <h2 class="h5">Inputs and outputs</h2>
+    <div class="table-responsive">
+      <table class="table table-sm crisp-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>date / datetime</td><td>input · YYYY-MM-DD [HH:00]</td><td>Day to forecast (any date; the model was trained with Nov 2015 – Apr 2017)</td></tr>
+          <tr><td>hour</td><td>input · 0–23</td><td>Hour of the day</td></tr>
+          <tr><td>junction</td><td>input · 1–4</td><td>Intersection of Chía</td></tr>
+          <tr><td>vehicles_per_hour</td><td>output · number</td><td>Expected vehicles per hour at that intersection</td></tr>
+          <tr><td>group</td><td>output · text</td><td>Type of moment from K-Means: Off-peak, Moderate or Peak</td></tr>
+          <tr><td>hourly_curve</td><td>output · 24 numbers</td><td>Forecast for every hour of the same day</td></tr>
+          <tr><td>model, model_version</td><td>output · text</td><td>Selected model and the version of the saved artifact</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small mb-1">The same prediction is available as a JSON API for the information system (dashboard and simulation):</p>
+    <pre class="demo-code">curl -X POST {{ request.host_url }}v1/forecast -H "Content-Type: application/json" \
+     -d '{"date": "2017-06-12", "hour": 8, "junction": 1}'</pre>
+  </section>
+
+  <section class="mt-5 row gx-4 gy-4">
+    <div class="col-lg-6">
+      <h2 class="h5">Feedback and incidents</h2>
+      <form id="f-feedback" class="row gx-3 gy-2">
+        <div class="col-5"><select class="form-select form-select-sm" id="fb-type"><option value="feedback">Feedback</option><option value="incident">Incident</option></select></div>
+        <div class="col-7"><input class="form-control form-control-sm" id="fb-name" placeholder="Your name (optional)"></div>
+        <div class="col-12"><textarea class="form-control form-control-sm" id="fb-msg" rows="3" placeholder="What did you observe?" required></textarea></div>
+        <div class="col-12"><button class="btn btn-outline-dark btn-sm" type="submit">Send</button> <span id="fb-ok" class="small text-success"></span></div>
+      </form>
+    </div>
+    <div class="col-lg-6">
+      <h2 class="h5">Live monitoring log</h2>
+      <div id="m-summary" class="small text-secondary mb-2"></div>
+      <div class="table-responsive"><table class="table table-sm small">
+        <thead><tr><th>Time</th><th>Input</th><th class="text-end">Output</th><th class="text-end">Latency</th></tr></thead>
+        <tbody id="m-rows"><tr><td colspan="4" class="text-secondary">No predictions yet.</td></tr></tbody>
+      </table></div>
+      <p class="small text-secondary mb-0">Each prediction is written to logs/predictions.jsonl. Feedback and incidents go to logs/feedback.jsonl.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const COLORS = { "Off-peak": "success", "Moderate": "warning", "Peak": "danger" };
+async function refreshMonitor() {
+  const m = await (await fetch("/v1/monitoring")).json();
+  $("m-summary").textContent = `Since ${m.since}: ${m.predictions} predictions · ${m.errors} errors · ${m.feedback} feedback (${m.incidents} incidents)` +
+    (m.latency_ms_p95 != null ? ` · latency p95 ${m.latency_ms_p95} ms` : "");
+  if (m.recent_predictions.length) {
+    $("m-rows").innerHTML = m.recent_predictions.map((r) => `<tr><td>${r.timestamp.slice(11)}</td>
+      <td>${r.input.datetime} · J${r.input.junction}</td><td class="text-end">${r.output}</td><td class="text-end">${r.latency_ms} ms</td></tr>`).join("");
+  }
+}
+$("f-demo").onsubmit = async (e) => {
+  e.preventDefault();
+  $("d-error").classList.add("d-none");
+  const body = { date: $("d-date").value, hour: Number($("d-hour").value), junction: Number($("d-junction").value) };
+  const r = await fetch("/v1/forecast", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json();
+  if (!d.ok) { $("d-error").textContent = d.error; $("d-error").classList.remove("d-none"); return; }
+  $("d-empty").classList.add("d-none"); $("d-result").classList.remove("d-none");
+  $("r-value").textContent = `${d.vehicles_per_hour} veh/h`;
+  $("r-group").className = `badge text-bg-${COLORS[d.group]}`; $("r-group").textContent = d.group;
+  $("r-meta").textContent = `${d.intersection} · ${d.datetime} · ${d.model} (version ${d.model_version})`;
+  $("r-notes").innerHTML = d.notes.map((n) => `<div class="text-warning-emphasis">${n}</div>`).join("");
+  const max = Math.max(...d.hourly_curve, 1);
+  $("r-curve").innerHTML = d.hourly_curve.map((v, h) => `<div class="bar${h === body.hour ? " on" : ""}" style="height:${Math.max(3, 100 * v / max)}%" title="${String(h).padStart(2, "0")}:00 · ${v} veh/h"></div>`).join("");
+  refreshMonitor();
+};
+$("f-feedback").onsubmit = async (e) => {
+  e.preventDefault();
+  const r = await fetch("/v1/feedback", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: $("fb-type").value, name: $("fb-name").value, message: $("fb-msg").value, context: "demo page" }) });
+  const d = await r.json();
+  $("fb-ok").textContent = d.ok ? "Logged. Thank you." : d.error;
+  if (d.ok) { $("fb-msg").value = ""; refreshMonitor(); }
+};
+refreshMonitor();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

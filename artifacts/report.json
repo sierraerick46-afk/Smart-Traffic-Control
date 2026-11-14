@@ -1,0 +1,826 @@
+{
+ "generated_at": "2026-11-14T00:45:12",
+ "seed": 42,
+ "splits": {
+  "train": {
+   "from": "2015-11-01",
+   "to_exclusive": "2017-03-01",
+   "rows": 36408,
+   "rows_by_junction": {
+    "1": 11664,
+    "2": 11664,
+    "3": 11664,
+    "4": 1416
+   }
+  },
+  "validation": {
+   "from": "2017-03-01",
+   "to_exclusive": "2017-05-01",
+   "rows": 5856,
+   "rows_by_junction": {
+    "1": 1464,
+    "2": 1464,
+    "3": 1464,
+    "4": 1464
+   }
+  },
+  "test": {
+   "from": "2017-05-01",
+   "to_exclusive": "2017-07-01",
+   "rows": 5856,
+   "rows_by_junction": {
+    "1": 1464,
+    "2": 1464,
+    "3": 1464,
+    "4": 1464
+   }
+  }
+ },
+ "cv": {
+  "method": "TimeSeriesSplit",
+  "n_splits": 5,
+  "on": "training partition only"
+ },
+ "grids": {
+  "ridge": {
+   "alpha": [
+    0.1,
+    1.0,
+    10.0
+   ]
+  },
+  "random_forest": {
+   "n_estimators": [
+    100,
+    200
+   ],
+   "max_depth": [
+    12,
+    20
+   ],
+   "min_samples_leaf": [
+    1,
+    3
+   ]
+  },
+  "gradient_boosting": {
+   "learning_rate": [
+    0.05,
+    0.1
+   ],
+   "max_depth": [
+    6,
+    10
+   ],
+   "max_iter": [
+    200,
+    400
+   ]
+  },
+  "mlp": {
+   "hidden": [
+    [
+     64,
+     32
+    ],
+    [
+     128,
+     64
+    ]
+   ],
+   "lr": [
+    0.001,
+    0.003
+   ]
+  }
+ },
+ "data_quality": {
+  "before": {
+   "rows": 48120,
+   "columns": [
+    "DateTime",
+    "Junction",
+    "Vehicles",
+    "ID"
+   ],
+   "missing_values": {
+    "DateTime": 0,
+    "Junction": 0,
+    "Vehicles": 0,
+    "ID": 0
+   },
+   "invalid_dates": 0,
+   "negative_counts": 0,
+   "duplicated_date_junction": 0,
+   "date_from": "2015-11-01 00:00:00",
+   "date_to": "2017-06-30 23:00:00",
+   "vehicles_describe": {
+    "count": 48120.0,
+    "mean": 22.79,
+    "std": 20.75,
+    "min": 1.0,
+    "25%": 9.0,
+    "50%": 15.0,
+    "75%": 29.0,
+    "max": 180.0
+   },
+   "sample": [
+    {
+     "DateTime": "2015-11-01 00:00:00",
+     "Junction": 1,
+     "Vehicles": 15,
+     "ID": 20151101001
+    },
+    {
+     "DateTime": "2015-11-01 01:00:00",
+     "Junction": 1,
+     "Vehicles": 13,
+     "ID": 20151101011
+    },
+    {
+     "DateTime": "2015-11-01 02:00:00",
+     "Junction": 1,
+     "Vehicles": 10,
+     "ID": 20151101021
+    },
+    {
+     "DateTime": "2015-11-01 03:00:00",
+     "Junction": 1,
+     "Vehicles": 7,
+     "ID": 20151101031
+    },
+    {
+     "DateTime": "2015-11-01 04:00:00",
+     "Junction": 1,
+     "Vehicles": 9,
+     "ID": 20151101041
+    }
+   ]
+  },
+  "after": {
+   "rows": 48120,
+   "feature_names": [
+    "hour",
+    "dayofweek",
+    "is_weekend",
+    "cluster",
+    "hour_sin",
+    "hour_cos",
+    "days_since_start",
+    "month",
+    "junction_1",
+    "junction_2",
+    "junction_3",
+    "junction_4"
+   ],
+   "train_target_describe_before_cap": {
+    "count": 36408.0,
+    "mean": 20.85,
+    "std": 18.02,
+    "min": 1.0,
+    "25%": 9.0,
+    "50%": 14.0,
+    "75%": 27.0,
+    "max": 180.0
+   },
+   "train_target_describe_after_cap": {
+    "count": 36408.0,
+    "mean": 20.78,
+    "std": 17.76,
+    "min": 1.0,
+    "25%": 9.0,
+    "50%": 14.0,
+    "75%": 27.0,
+    "max": 93.0
+   },
+   "outliers_by_junction": {
+    "1": {
+     "cap_p99_5": 93.0,
+     "rows_above_cap": 57,
+     "max_before": 156,
+     "max_after": 93.0
+    },
+    "2": {
+     "cap_p99_5": 28.0,
+     "rows_above_cap": 52,
+     "max_before": 40,
+     "max_after": 28.0
+    },
+    "3": {
+     "cap_p99_5": 64.0,
+     "rows_above_cap": 57,
+     "max_before": 180,
+     "max_after": 64.0
+    },
+    "4": {
+     "cap_p99_5": 19.0,
+     "rows_above_cap": 5,
+     "max_before": 28,
+     "max_after": 19.0
+    }
+   },
+   "sample_features": [
+    {
+     "hour": 0.0,
+     "dayofweek": 6.0,
+     "is_weekend": 1.0,
+     "cluster": 0.0,
+     "hour_sin": 0.0,
+     "hour_cos": 1.0,
+     "days_since_start": 0.0,
+     "month": 11.0,
+     "junction_1": 1.0,
+     "junction_2": 0.0,
+     "junction_3": 0.0,
+     "junction_4": 0.0
+    },
+    {
+     "hour": 0.0,
+     "dayofweek": 6.0,
+     "is_weekend": 1.0,
+     "cluster": 1.0,
+     "hour_sin": 0.0,
+     "hour_cos": 1.0,
+     "days_since_start": 0.0,
+     "month": 11.0,
+     "junction_1": 0.0,
+     "junction_2": 1.0,
+     "junction_3": 0.0,
+     "junction_4": 0.0
+    },
+    {
+     "hour": 0.0,
+     "dayofweek": 6.0,
+     "is_weekend": 1.0,
+     "cluster": 1.0,
+     "hour_sin": 0.0,
+     "hour_cos": 1.0,
+     "days_since_start": 0.0,
+     "month": 11.0,
+     "junction_1": 0.0,
+     "junction_2": 0.0,
+     "junction_3": 1.0,
+     "junction_4": 0.0
+    },
+    {
+     "hour": 1.0,
+     "dayofweek": 6.0,
+     "is_weekend": 1.0,
+     "cluster": 0.0,
+     "hour_sin": 0.259,
+     "hour_cos": 0.966,
+     "days_since_start": 0.042,
+     "month": 11.0,
+     "junction_1": 0.0,
+     "junction_2": 0.0,
+     "junction_3": 1.0,
+     "junction_4": 0.0
+    },
+    {
+     "hour": 1.0,
+     "dayofweek": 6.0,
+     "is_weekend": 1.0,
+     "cluster": 0.0,
+     "hour_sin": 0.259,
+     "hour_cos": 0.966,
+     "days_since_start": 0.042,
+     "month": 11.0,
+     "junction_1": 1.0,
+     "junction_2": 0.0,
+     "junction_3": 0.0,
+     "junction_4": 0.0
+    }
+   ],
+   "sample_raw_for_features": [
+    {
+     "datetime": "2015-11-01 00:00:00",
+     "junction": "1",
+     "vehicles": "15"
+    },
+    {
+     "datetime": "2015-11-01 00:00:00",
+     "junction": "2",
+     "vehicles": "6"
+    },
+    {
+     "datetime": "2015-11-01 00:00:00",
+     "junction": "3",
+     "vehicles": "9"
+    },
+    {
+     "datetime": "2015-11-01 01:00:00",
+     "junction": "3",
+     "vehicles": "7"
+    },
+    {
+     "datetime": "2015-11-01 01:00:00",
+     "junction": "1",
+     "vehicles": "13"
+    }
+   ]
+  }
+ },
+ "silhouette_train": {
+  "1": 0.565,
+  "2": 0.503,
+  "3": 0.639,
+  "4": 0.463
+ },
+ "families": {
+  "seasonal_mean": {
+   "label": "Seasonal mean (baseline)",
+   "best_params": {},
+   "cv_rmse_mean": 12.678,
+   "cv_rmse_std": 4.589,
+   "cv_r2_mean": 0.5063,
+   "cv_folds": [
+    {
+     "mse": 71.182,
+     "rmse": 8.437,
+     "mae": 5.918,
+     "r2": 0.4717,
+     "fold": 1,
+     "train_rows": 6068,
+     "val_rows": 6068,
+     "val_from": "2016-01-24",
+     "val_to": "2016-04-17",
+     "seconds": 0.0
+    },
+    {
+     "mse": 64.815,
+     "rmse": 8.051,
+     "mae": 5.537,
+     "r2": 0.6778,
+     "fold": 2,
+     "train_rows": 12136,
+     "val_rows": 6068,
+     "val_from": "2016-04-17",
+     "val_to": "2016-07-10",
+     "seconds": 0.0
+    },
+    {
+     "mse": 149.177,
+     "rmse": 12.214,
+     "mae": 8.022,
+     "r2": 0.5631,
+     "fold": 3,
+     "train_rows": 18204,
+     "val_rows": 6068,
+     "val_from": "2016-07-10",
+     "val_to": "2016-10-03",
+     "seconds": 0.0
+    },
+    {
+     "mse": 196.485,
+     "rmse": 14.017,
+     "mae": 9.614,
+     "r2": 0.5771,
+     "fold": 4,
+     "train_rows": 24272,
+     "val_rows": 6068,
+     "val_from": "2016-10-03",
+     "val_to": "2016-12-26",
+     "seconds": 0.0
+    },
+    {
+     "mse": 427.246,
+     "rmse": 20.67,
+     "mae": 15.378,
+     "r2": 0.2419,
+     "fold": 5,
+     "train_rows": 30340,
+     "val_rows": 6068,
+     "val_from": "2016-12-26",
+     "val_to": "2017-02-28",
+     "seconds": 0.0
+    }
+   ],
+   "train": {
+    "mse": 98.378,
+    "rmse": 9.919,
+    "mae": 6.43,
+    "r2": 0.6971
+   },
+   "validation": {
+    "mse": 222.121,
+    "rmse": 14.904,
+    "mae": 10.856,
+    "r2": 0.6258
+   },
+   "train_seconds": 0.0
+  },
+  "ridge": {
+   "label": "Ridge regression",
+   "best_params": {
+    "alpha": 1.0
+   },
+   "cv_rmse_mean": 12.426,
+   "cv_rmse_std": 5.517,
+   "cv_r2_mean": 0.5135,
+   "cv_folds": [
+    {
+     "mse": 73.625,
+     "rmse": 8.581,
+     "mae": 5.816,
+     "r2": 0.4535,
+     "fold": 1,
+     "train_rows": 6068,
+     "val_rows": 6068,
+     "val_from": "2016-01-24",
+     "val_to": "2016-04-17",
+     "seconds": 0.0
+    },
+    {
+     "mse": 58.65,
+     "rmse": 7.658,
+     "mae": 5.762,
+     "r2": 0.7084,
+     "fold": 2,
+     "train_rows": 12136,
+     "val_rows": 6068,
+     "val_from": "2016-04-17",
+     "val_to": "2016-07-10",
+     "seconds": 0.01
+    },
+    {
+     "mse": 115.204,
+     "rmse": 10.733,
+     "mae": 6.982,
+     "r2": 0.6626,
+     "fold": 3,
+     "train_rows": 18204,
+     "val_rows": 6068,
+     "val_from": "2016-07-10",
+     "val_to": "2016-10-03",
+     "seconds": 0.01
+    },
+    {
+     "mse": 147.975,
+     "rmse": 12.164,
+     "mae": 8.715,
+     "r2": 0.6815,
+     "fold": 4,
+     "train_rows": 24272,
+     "val_rows": 6068,
+     "val_from": "2016-10-03",
+     "val_to": "2016-12-26",
+     "seconds": 0.01
+    },
+    {
+     "mse": 528.829,
+     "rmse": 22.996,
+     "mae": 17.136,
+     "r2": 0.0617,
+     "fold": 5,
+     "train_rows": 30340,
+     "val_rows": 6068,
+     "val_from": "2016-12-26",
+     "val_to": "2017-02-28",
+     "seconds": 0.01
+    }
+   ],
+   "train": {
+    "mse": 78.168,
+    "rmse": 8.841,
+    "mae": 6.308,
+    "r2": 0.7593
+   },
+   "validation": {
+    "mse": 120.495,
+    "rmse": 10.977,
+    "mae": 7.929,
+    "r2": 0.797
+   },
+   "train_seconds": 0.01
+  },
+  "random_forest": {
+   "label": "Random Forest",
+   "best_params": {
+    "n_estimators": 100,
+    "max_depth": 12,
+    "min_samples_leaf": 3
+   },
+   "cv_rmse_mean": 10.38,
+   "cv_rmse_std": 5.712,
+   "cv_r2_mean": 0.6527,
+   "cv_folds": [
+    {
+     "mse": 42.935,
+     "rmse": 6.552,
+     "mae": 4.363,
+     "r2": 0.6813,
+     "fold": 1,
+     "train_rows": 6068,
+     "val_rows": 6068,
+     "val_from": "2016-01-24",
+     "val_to": "2016-04-17",
+     "seconds": 0.41
+    },
+    {
+     "mse": 37.32,
+     "rmse": 6.109,
+     "mae": 4.141,
+     "r2": 0.8145,
+     "fold": 2,
+     "train_rows": 12136,
+     "val_rows": 6068,
+     "val_from": "2016-04-17",
+     "val_to": "2016-07-10",
+     "seconds": 0.82
+    },
+    {
+     "mse": 89.73,
+     "rmse": 9.473,
+     "mae": 5.753,
+     "r2": 0.7372,
+     "fold": 3,
+     "train_rows": 18204,
+     "val_rows": 6068,
+     "val_from": "2016-07-10",
+     "val_to": "2016-10-03",
+     "seconds": 1.58
+    },
+    {
+     "mse": 67.492,
+     "rmse": 8.215,
+     "mae": 5.69,
+     "r2": 0.8547,
+     "fold": 4,
+     "train_rows": 24272,
+     "val_rows": 6068,
+     "val_from": "2016-10-03",
+     "val_to": "2016-12-26",
+     "seconds": 2.68
+    },
+    {
+     "mse": 464.375,
+     "rmse": 21.549,
+     "mae": 15.569,
+     "r2": 0.176,
+     "fold": 5,
+     "train_rows": 30340,
+     "val_rows": 6068,
+     "val_from": "2016-12-26",
+     "val_to": "2017-02-28",
+     "seconds": 2.11
+    }
+   ],
+   "train": {
+    "mse": 17.341,
+    "rmse": 4.164,
+    "mae": 2.303,
+    "r2": 0.9466
+   },
+   "validation": {
+    "mse": 43.398,
+    "rmse": 6.588,
+    "mae": 4.396,
+    "r2": 0.9269
+   },
+   "train_seconds": 2.81
+  },
+  "gradient_boosting": {
+   "label": "Gradient Boosting",
+   "best_params": {
+    "learning_rate": 0.1,
+    "max_depth": 10,
+    "max_iter": 400
+   },
+   "cv_rmse_mean": 10.209,
+   "cv_rmse_std": 6.488,
+   "cv_r2_mean": 0.6541,
+   "cv_folds": [
+    {
+     "mse": 37.027,
+     "rmse": 6.085,
+     "mae": 3.941,
+     "r2": 0.7252,
+     "fold": 1,
+     "train_rows": 6068,
+     "val_rows": 6068,
+     "val_from": "2016-01-24",
+     "val_to": "2016-04-17",
+     "seconds": 0.59
+    },
+    {
+     "mse": 34.82,
+     "rmse": 5.901,
+     "mae": 3.972,
+     "r2": 0.8269,
+     "fold": 2,
+     "train_rows": 12136,
+     "val_rows": 6068,
+     "val_from": "2016-04-17",
+     "val_to": "2016-07-10",
+     "seconds": 0.77
+    },
+    {
+     "mse": 79.6,
+     "rmse": 8.922,
+     "mae": 5.357,
+     "r2": 0.7669,
+     "fold": 3,
+     "train_rows": 18204,
+     "val_rows": 6068,
+     "val_from": "2016-07-10",
+     "val_to": "2016-10-03",
+     "seconds": 0.84
+    },
+    {
+     "mse": 50.845,
+     "rmse": 7.131,
+     "mae": 4.755,
+     "r2": 0.8906,
+     "fold": 4,
+     "train_rows": 24272,
+     "val_rows": 6068,
+     "val_from": "2016-10-03",
+     "val_to": "2016-12-26",
+     "seconds": 0.97
+    },
+    {
+     "mse": 529.329,
+     "rmse": 23.007,
+     "mae": 16.543,
+     "r2": 0.0608,
+     "fold": 5,
+     "train_rows": 30340,
+     "val_rows": 6068,
+     "val_from": "2016-12-26",
+     "val_to": "2017-02-28",
+     "seconds": 1.16
+    }
+   ],
+   "train": {
+    "mse": 14.804,
+    "rmse": 3.848,
+    "mae": 2.202,
+    "r2": 0.9544
+   },
+   "validation": {
+    "mse": 34.858,
+    "rmse": 5.904,
+    "mae": 4.044,
+    "r2": 0.9413
+   },
+   "train_seconds": 1.15
+  },
+  "mlp": {
+   "label": "MLP (PyTorch)",
+   "best_params": {
+    "hidden": [
+     64,
+     32
+    ],
+    "lr": 0.001
+   },
+   "cv_rmse_mean": 12.019,
+   "cv_rmse_std": 7.299,
+   "cv_r2_mean": 0.5295,
+   "cv_folds": [
+    {
+     "mse": 35.287,
+     "rmse": 5.94,
+     "mae": 3.833,
+     "r2": 0.7381,
+     "fold": 1,
+     "train_rows": 6068,
+     "val_rows": 6068,
+     "val_from": "2016-01-24",
+     "val_to": "2016-04-17",
+     "seconds": 2.28
+    },
+    {
+     "mse": 69.808,
+     "rmse": 8.355,
+     "mae": 5.382,
+     "r2": 0.653,
+     "fold": 2,
+     "train_rows": 12136,
+     "val_rows": 6068,
+     "val_from": "2016-04-17",
+     "val_to": "2016-07-10",
+     "seconds": 2.13
+    },
+    {
+     "mse": 130.569,
+     "rmse": 11.427,
+     "mae": 7.423,
+     "r2": 0.6176,
+     "fold": 3,
+     "train_rows": 18204,
+     "val_rows": 6068,
+     "val_from": "2016-07-10",
+     "val_to": "2016-10-03",
+     "seconds": 3.32
+    },
+    {
+     "mse": 66.9,
+     "rmse": 8.179,
+     "mae": 5.83,
+     "r2": 0.856,
+     "fold": 4,
+     "train_rows": 24272,
+     "val_rows": 6068,
+     "val_from": "2016-10-03",
+     "val_to": "2016-12-26",
+     "seconds": 4.0
+    },
+    {
+     "mse": 686.029,
+     "rmse": 26.192,
+     "mae": 17.018,
+     "r2": -0.2173,
+     "fold": 5,
+     "train_rows": 30340,
+     "val_rows": 6068,
+     "val_from": "2016-12-26",
+     "val_to": "2017-02-28",
+     "seconds": 4.4
+    }
+   ],
+   "train": {
+    "mse": 33.179,
+    "rmse": 5.76,
+    "mae": 3.422,
+    "r2": 0.8979
+   },
+   "validation": {
+    "mse": 36.344,
+    "rmse": 6.029,
+    "mae": 4.468,
+    "r2": 0.9388
+   },
+   "train_seconds": 5.93
+  }
+ },
+ "final": {
+  "selected": "gradient_boosting",
+  "label": "Gradient Boosting",
+  "params": {
+   "learning_rate": 0.1,
+   "max_depth": 10,
+   "max_iter": 400
+  },
+  "trained_on": "train + validation (2015-11-01 to 2017-04-30)",
+  "test_period": "2017-05-01 to 2017-06-30",
+  "test": {
+   "mse": 79.508,
+   "rmse": 8.917,
+   "mae": 5.635,
+   "r2": 0.9038
+  },
+  "test_by_junction": {
+   "1": {
+    "mse": 192.118,
+    "rmse": 13.861,
+    "mae": 10.45,
+    "r2": 0.7208
+   },
+   "2": {
+    "mse": 31.103,
+    "rmse": 5.577,
+    "mae": 4.366,
+    "r2": 0.6264
+   },
+   "3": {
+    "mse": 83.061,
+    "rmse": 9.114,
+    "mae": 5.426,
+    "r2": 0.0807
+   },
+   "4": {
+    "mse": 11.749,
+    "rmse": 3.428,
+    "mae": 2.299,
+    "r2": 0.2216
+   }
+  },
+  "test_baseline_seasonal_mean": {
+   "mse": 322.051,
+   "rmse": 17.946,
+   "mae": 11.927,
+   "r2": 0.6104
+  },
+  "train_seconds": 1.28,
+  "feature_importance": {
+   "hour": 8.84,
+   "dayofweek": 15.521,
+   "is_weekend": 0.0,
+   "cluster": 83.464,
+   "hour_sin": 14.75,
+   "hour_cos": 0.984,
+   "days_since_start": 0.0,
+   "month": 0.069,
+   "junction_1": 821.074,
+   "junction_2": 7.381,
+   "junction_3": 5.411,
+   "junction_4": 35.029
+  }
+ },
+ "success_criteria": {
+  "r2_min": 0.8,
+  "beats_baseline": true
+ },
+ "runtime_seconds": 233.2
+}
