@@ -102,7 +102,7 @@ class ControlService:
             dows = np.tile(np.repeat(np.arange(7), 24), n)
             js = np.repeat(self.junctions, 168)
             cl = self.clustering.cluster_array(hours, dows, js)
-            pr = self.prediction.predict_many(hours, dows, cl, js, name)
+            pr = self.prediction.predict_many(hours, dows, cl, js, name, reference="typical")
             self._ctx[key] = {(int(j), int(d), int(h)): (int(c), float(p))
                               for j, d, h, c, p in zip(js, dows, hours, cl, pr)}
         return self._ctx[key]

@@ -53,7 +53,7 @@ def create_api_blueprint(svc):
         c = clustering.get_cluster(h, d, j)
         return jsonify({"hora": h, "dia": d, "cluster": c, "cluster_label": clustering.label(c),
                         "vehicles": round(prediction.predict(h, d, c, j), 1),
-                        "model": prediction.model_label()})
+                        "model": prediction.model_label(), "reference_date": prediction.ref_date})
 
     control = svc["control"]
 

@@ -52,9 +52,9 @@ PHASES = [
                 "head": ["Junction", "Intersection", "Records", "Mean veh/h", "P95 veh/h"],
                 "rows": [
                     ["1", "Av. Pradilla con Cra 3", "14,592", "45.1", "89"],
-                    ["2", "Cra 9 con Calle 10", "14,592", "14.3", "30"],
+                    ["2", "Cra 9 con Calle 17", "14,592", "14.3", "30"],
                     ["3", "Calle 21 (Av. Chilacos) con Cra 9", "14,592", "13.7", "30"],
-                    ["4", "Calle 11 con Cra 17", "4,344", "7.3", "13"],
+                    ["4", "Calle 11 con Cra 15", "4,344", "7.3", "13"],
                 ],
             }
         ],
@@ -93,7 +93,7 @@ PHASES = [
                 "applied": [
                     "Time features: hour, day of the week, weekend flag and month.",
                     "Cyclic encoding of the hour with sine and cosine, so that 23:00 and 00:00 are close.",
-                    "The cluster from phase Group and a one-hot encoding of the intersection are added as features for the forecast.",
+                    "The cluster from phase Group, a one-hot encoding of the intersection and the date trend (days since the first record and month) are added as features for the forecast.",
                     "Standardization: K-Means works on standardized profiles, the MLP on standardized inputs and outputs, and the DQN state is scaled between 0 and 1.",
                 ],
             },
@@ -119,6 +119,7 @@ PHASES = [
                     ["Time features", "datetime", "hour, dayofweek, is_weekend, month", "Describe the moment"],
                     ["Cyclic hour", "hour", "sin(hour), cos(hour)", "Keep midnight continuous"],
                     ["One-hot", "junction", "4 binary columns", "Tell the model which intersection it is"],
+                    ["Date trend", "datetime", "days since first record, month", "Capture the growth of traffic over time"],
                 ],
             }
         ],
@@ -178,7 +179,7 @@ PHASES = [
                     ["Group", "K-Means", "k = 3, n_init = 10, inputs: mean and standard deviation per day-hour"],
                     ["Predict", "Random Forest", "120 trees, max depth 14, min samples per leaf 2"],
                     ["Predict", "Gradient Boosting", "200 iterations, learning rate 0.08, max depth 8"],
-                    ["Predict", "MLP (PyTorch)", "10 inputs → 64 → 32 → 1, ReLU, dropout 0.05, Adam lr 0.001, weight decay 1e-5, 40 epochs"],
+                    ["Predict", "MLP (PyTorch)", "12 inputs → 64 → 32 → 1, ReLU, dropout 0.05, Adam lr 0.001, weight decay 1e-5, 40 epochs"],
                     ["Decide", "DQN (PyTorch)", "9 inputs → 64 → 64 → 2 actions, gamma 0.97, batch 64, replay buffer 20,000, target sync every 200 steps"],
                     ["Simulator", "Intersection", "4 approaches, 2 phases, minimum green 8 s, maximum green 60 s, yellow 3 s, queue limit 40"],
                 ],
@@ -208,6 +209,7 @@ PHASES = [
                 "method": "Evaluate the ability to generalize with different subsets of the data.",
                 "applied": [
                     "The forecast uses hold-out validation: 80% to train and 20% to test, always with the same seed so the three models face exactly the same test set.",
+                    "Temporal check: training only with data before 22 March 2017 and predicting the following months still gives R² between 0.935 and 0.940 for the three models, so the result does not depend on a lucky split.",
                     "The agent is evaluated on episodes with seeds different from those used in training, on all 4 intersections.",
                     "Pending improvement: k-fold cross-validation (for example, 5 folds) to report the mean and spread of each metric.",
                 ],
@@ -217,9 +219,9 @@ PHASES = [
                 "method": "Identify problems such as overfitting, underfitting or bias.",
                 "applied": [
                     "<b>Overfitting:</b> controlled with depth limits, minimum leaf size, dropout and weight decay, and always measured on data the models did not see.",
-                    "<b>Underfitting:</b> the first version without the intersection as a feature reached only R² = 0.11; adding it raised R² to 0.68.",
+                    "<b>Underfitting:</b> the first version reached only R² = 0.11; adding the intersection and the date trend raised it to 0.96, above the 0.8 required to use the model.",
                     "<b>Bias:</b> junction 4 has a third of the data of the others, and the counts do not come from Chía.",
-                    "<b>Control:</b> the agent improves the total queue, but at intersection 3 it was slightly worse than the fixed plan in the reference run.",
+                    "<b>Control:</b> results vary between trainings because of random exploration; over 5 trainings the queue reduction ranged from 14% to 33%, so the agent should be retrained and evaluated before trusting a single run.",
                 ],
             },
             {
@@ -237,21 +239,21 @@ PHASES = [
                 "caption": "Forecast models on the test set (9,624 rows)",
                 "head": ["Model", "MSE", "MAE (veh)", "R²", "Training time"],
                 "rows": [
-                    ["Random Forest", "137.93", "7.87", "0.678", "≈ 4.5 s"],
-                    ["Gradient Boosting", "136.38", "7.84", "0.682", "≈ 6.4 s"],
-                    ["MLP (PyTorch) ✓", "136.00", "7.83", "0.683", "≈ 9.0 s"],
+                    ["Random Forest ✓", "17.88", "2.54", "0.958", "≈ 8 s"],
+                    ["Gradient Boosting", "20.20", "2.67", "0.953", "≈ 3 s"],
+                    ["MLP (PyTorch)", "32.27", "3.50", "0.925", "≈ 8 s"],
                 ],
             },
             {
-                "caption": "Control agent vs fixed-time signal (60 training episodes)",
+                "caption": "Control agent vs fixed-time signal (mean of 5 trainings of 60 episodes)",
                 "head": ["Policy", "Average queue (veh)", "Vehicles served", "Vehicles lost"],
                 "rows": [
-                    ["DQN agent", "10.31", "172.3", "0"],
-                    ["Fixed time (30 s)", "11.83", "172.0", "0"],
+                    ["DQN agent", "7.94", "169.0", "0"],
+                    ["Fixed time (30 s)", "10.58", "166.2", "0"],
                 ],
             },
         ],
-        "note": "According to KDnuggets (2025), a rigorous evaluation is essential to trust a model in real conditions. The three forecasting models perform almost the same; the MLP wins by a small margin, and the agent reduces the average queue by about 13% compared with the fixed plan.",
+        "note": "According to KDnuggets (2025), a rigorous evaluation is essential to trust a model in real conditions. The three forecasting models pass R² = 0.9; Random Forest wins with R² = 0.958 and an average error of 2.5 vehicles per hour, and the agent reduces the average queue by 25% on average (14% to 33% across 5 trainings) compared with the fixed plan.",
     },
     {
         "num": 5,
@@ -330,7 +332,7 @@ PHASES = [
                 "name": "Drift detection",
                 "method": "Detect early any deterioration caused by changes in the data or the environment.",
                 "applied": [
-                    "Compare the MAE of new forecasts with the reference value of about 7.8 vehicles; a sustained increase signals drift.",
+                    "Compare the MAE of new forecasts with the reference value of about 2.5 vehicles; a sustained increase signals drift.",
                     "Compare the average demand per intersection and per hour of new data with the historical profile.",
                     "Check whether the silhouette index of the clusters drops when new data is added.",
                 ],
@@ -348,7 +350,7 @@ PHASES = [
                 "name": "Risk review",
                 "method": "Continuously assess vulnerabilities and adapt quality controls as the context evolves.",
                 "applied": [
-                    "Review the intersections where the agent does not beat the fixed plan before trusting it there.",
+                    "Evaluate every new training against the fixed plan on each intersection before trusting it there.",
                     "Replace the public counts with real measurements from Chía as soon as they are available.",
                     "Keep the login and change the passwords when the team changes.",
                 ],
