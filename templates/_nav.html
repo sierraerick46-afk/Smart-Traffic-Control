@@ -13,6 +13,7 @@
           {% endfor %}
         </ul>
       </div>
+      <a class="nav-link{% if active == 'demo' %} active{% endif %}" href="/demo">Demo</a>
       <a class="nav-link{% if active == 'dashboard' %} active{% endif %}" href="/dashboard">Dashboard</a>
       <a class="nav-link{% if active == 'simula' %} active{% endif %}" href="/simula">Simulation</a>
       {% if session.get("user") %}

@@ -1,0 +1,205 @@
+{
+ "runs": [
+  {
+   "seed": 0,
+   "improvement_pct": 19.8,
+   "dqn": {
+    "avg_queue": 8.62,
+    "overflow": 0.0,
+    "throughput": 165.6
+   },
+   "fixed": {
+    "avg_queue": 10.75,
+    "overflow": 0.0,
+    "throughput": 163.7
+   },
+   "by_intersection": {
+    "1": {
+     "dqn": 5.43,
+     "fixed": 8.36
+    },
+    "2": {
+     "dqn": 10.55,
+     "fixed": 11.3
+    },
+    "3": {
+     "dqn": 8.51,
+     "fixed": 10.22
+    },
+    "4": {
+     "dqn": 10.0,
+     "fixed": 13.11
+    }
+   },
+   "reward_first": -50.88,
+   "reward_last": -48.15
+  },
+  {
+   "seed": 1,
+   "improvement_pct": 22.6,
+   "dqn": {
+    "avg_queue": 8.32,
+    "overflow": 0.0,
+    "throughput": 167.0
+   },
+   "fixed": {
+    "avg_queue": 10.75,
+    "overflow": 0.0,
+    "throughput": 163.7
+   },
+   "by_intersection": {
+    "1": {
+     "dqn": 5.15,
+     "fixed": 8.36
+    },
+    "2": {
+     "dqn": 9.53,
+     "fixed": 11.3
+    },
+    "3": {
+     "dqn": 7.16,
+     "fixed": 10.22
+    },
+    "4": {
+     "dqn": 11.45,
+     "fixed": 13.11
+    }
+   },
+   "reward_first": -40.53,
+   "reward_last": -50.67
+  },
+  {
+   "seed": 2,
+   "improvement_pct": -15.3,
+   "dqn": {
+    "avg_queue": 12.4,
+    "overflow": 0.0,
+    "throughput": 161.4
+   },
+   "fixed": {
+    "avg_queue": 10.75,
+    "overflow": 0.0,
+    "throughput": 163.7
+   },
+   "by_intersection": {
+    "1": {
+     "dqn": 9.65,
+     "fixed": 8.36
+    },
+    "2": {
+     "dqn": 12.99,
+     "fixed": 11.3
+    },
+    "3": {
+     "dqn": 12.03,
+     "fixed": 10.22
+    },
+    "4": {
+     "dqn": 14.91,
+     "fixed": 13.11
+    }
+   },
+   "reward_first": -52.88,
+   "reward_last": -41.0
+  },
+  {
+   "seed": 3,
+   "improvement_pct": 14.7,
+   "dqn": {
+    "avg_queue": 9.17,
+    "overflow": 0.0,
+    "throughput": 165.2
+   },
+   "fixed": {
+    "avg_queue": 10.75,
+    "overflow": 0.0,
+    "throughput": 163.7
+   },
+   "by_intersection": {
+    "1": {
+     "dqn": 5.45,
+     "fixed": 8.36
+    },
+    "2": {
+     "dqn": 10.29,
+     "fixed": 11.3
+    },
+    "3": {
+     "dqn": 10.21,
+     "fixed": 10.22
+    },
+    "4": {
+     "dqn": 10.72,
+     "fixed": 13.11
+    }
+   },
+   "reward_first": -76.05,
+   "reward_last": -45.23
+  },
+  {
+   "seed": 4,
+   "improvement_pct": 33.4,
+   "dqn": {
+    "avg_queue": 7.16,
+    "overflow": 0.0,
+    "throughput": 168.0
+   },
+   "fixed": {
+    "avg_queue": 10.75,
+    "overflow": 0.0,
+    "throughput": 163.7
+   },
+   "by_intersection": {
+    "1": {
+     "dqn": 5.18,
+     "fixed": 8.36
+    },
+    "2": {
+     "dqn": 8.44,
+     "fixed": 11.3
+    },
+    "3": {
+     "dqn": 6.9,
+     "fixed": 10.22
+    },
+    "4": {
+     "dqn": 8.13,
+     "fixed": 13.11
+    }
+   },
+   "reward_first": -35.67,
+   "reward_last": -71.62
+  }
+ ],
+ "improvement_mean": 15.0,
+ "improvement_min": -15.3,
+ "improvement_max": 33.4,
+ "dqn": {
+  "avg_queue": 9.13,
+  "overflow": 0.0,
+  "throughput": 165.44
+ },
+ "fixed": {
+  "avg_queue": 10.75,
+  "overflow": 0.0,
+  "throughput": 163.7
+ },
+ "by_intersection": {
+  "1": {
+   "dqn": 6.17,
+   "fixed": 8.36
+  },
+  "2": {
+   "dqn": 10.36,
+   "fixed": 11.3
+  },
+  "3": {
+   "dqn": 8.96,
+   "fixed": 10.22
+  },
+  "4": {
+   "dqn": 11.04,
+   "fixed": 13.11
+  }
+ }
+}

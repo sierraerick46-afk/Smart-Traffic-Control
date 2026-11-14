@@ -27,7 +27,21 @@
     {% endfor %}
   </div>
 
-  <div class="callout mt-4">The phases are iterative: the evaluation sent the project back to data engineering when the first forecast reached only R² = 0.11; adding the intersection and the date trend as features raised it to 0.96.</div>
+  {% if rep %}
+  <section class="crisp-section mt-4" style="--phase:#00482b">
+    <h2>Project overview</h2>
+    <p><b>Problem.</b> Fixed-time traffic lights in Chía cannot adapt to demand. <b>Approach.</b> Forecast the vehicles per hour of four intersections
+      (supervised regression), group the hours of the week into off-peak, moderate and peak (K-Means) and let a DQN agent decide the green in a simulator.</p>
+    <div class="row gx-3 gy-3 mt-1">
+      <div class="col-6 col-md-3"><div class="ov-stat"><b>{{ "{:,}".format(rep.data_quality.before.rows) }}</b><span>hourly records (traffic.csv)</span></div></div>
+      <div class="col-6 col-md-3"><div class="ov-stat"><b>5</b><span>algorithms compared with time-series CV</span></div></div>
+      <div class="col-6 col-md-3"><div class="ov-stat"><b>{{ rep.final.test.r2 }}</b><span>R² of {{ rep.final.label }} on the independent test set</span></div></div>
+      <div class="col-6 col-md-3"><div class="ov-stat"><b>{{ rep.final.test.mae }}</b><span>vehicles per hour of average error (MAE)</span></div></div>
+    </div>
+    <p class="mt-3 mb-0">Try the saved model in the <a href="/demo">Demo</a>. The full process can be reproduced with <code>python train.py</code> (see the README).</p>
+  </section>
+  {% endif %}
+  <div class="callout mt-4">The phases are iterative: the first forecast reached only R² = 0.11; the evaluation sent the project back to data engineering, where the intersection and the date trend were added, and the protocol was rebuilt with time-ordered partitions.</div>
 
   {% include "_crisp_refs.html" %}
 </main>

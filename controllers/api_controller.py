@@ -39,7 +39,7 @@ def create_api_blueprint(svc):
     @bp.route("/train_prediction", methods=["GET", "POST"])
     def train_prediction():
         try:
-            return jsonify({"ok": True, "metrics": prediction.train()})
+            return jsonify({"ok": True, **prediction.train()})
         except Exception as e:
             return jsonify({"ok": False, "error": str(e)}), 500
 
