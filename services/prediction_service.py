@@ -3,6 +3,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
+import pandas as pd
 import torch
 from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -28,19 +29,30 @@ class PredictionService:
         self.version = 0
         self._baseline = None
         self._lock = threading.Lock()
+        df = self.loader.get_data()
+        self._t0 = df["datetime"].min()
+        last = df["datetime"].max()
+        self.ref_days = float((last - self._t0).total_seconds() / 86400)
+        self.ref_month = int(last.month)
+        self.ref_date = last.strftime("%Y-%m-%d")
+        g = df.assign(d=(df["datetime"] - self._t0).dt.total_seconds() / 86400).groupby("junction")["d"]
+        self.typical_days = {j: np.linspace(lo, hi, 12) for j, lo, hi in zip(g.min().index, g.min().values, g.max().values)}
 
     def _jindex(self, junctions):
         m = {j: i for i, j in enumerate(self.clustering.junctions)}
         return np.array([m.get(int(j), 0) for j in np.atleast_1d(junctions)])
 
-    def _features(self, hours, dows, clusters, junctions):
+    def _features(self, hours, dows, clusters, junctions, days=None, months=None):
         hours = np.atleast_1d(np.asarray(hours, dtype=float))
         dows = np.atleast_1d(np.asarray(dows, dtype=float))
         clusters = np.atleast_1d(np.asarray(clusters, dtype=float))
+        n = len(hours)
+        days = np.full(n, self.ref_days) if days is None else np.asarray(days, dtype=float)
+        months = np.full(n, self.ref_month) if months is None else np.asarray(months, dtype=float)
         ang = 2 * np.pi * hours / 24
         onehot = np.eye(len(self.clustering.junctions))[self._jindex(junctions)]
         base = np.column_stack([hours, dows, (dows >= 5).astype(float), clusters,
-                                np.sin(ang), np.cos(ang)])
+                                np.sin(ang), np.cos(ang), days, months])
         return np.hstack([base, onehot]).astype(np.float32)
 
     def _dataset(self):
@@ -49,7 +61,8 @@ class PredictionService:
             df = df.sample(self.max_rows, random_state=self.seed)
         h, d, j = df["hour"].values, df["dayofweek"].values, df["junction"].values
         cl = self.clustering.cluster_array(h, d, j)
-        return self._features(h, d, cl, j), df["vehicles"].values.astype(np.float32)
+        days = (df["datetime"] - self._t0).dt.total_seconds().values / 86400
+        return self._features(h, d, cl, j, days, df["month"].values), df["vehicles"].values.astype(np.float32)
 
     @staticmethod
     def _metrics(y, p, secs):
@@ -142,10 +155,10 @@ class PredictionService:
             return self._mlp_forward(m[0], m[1], X)
         return m.predict(X)
 
-    def predict_many(self, hours, dows, clusters=None, junctions=None, model=None):
+    def predict_many(self, hours, dows, clusters=None, junctions=None, model=None, reference="latest"):
         hours, dows = np.asarray(hours, int), np.asarray(dows, int)
         if junctions is None:
-            return np.mean([self.predict_many(hours, dows, None, np.full(len(hours), j), model)
+            return np.mean([self.predict_many(hours, dows, None, np.full(len(hours), j), model, reference)
                             for j in self.clustering.junctions], axis=0)
         junctions = np.atleast_1d(np.asarray(junctions, int))
         if clusters is None:
@@ -154,7 +167,15 @@ class PredictionService:
         if name == "historical":
             out = self._baseline_table()[self._jindex(junctions), dows % 7, hours % 24]
         else:
-            out = self._predict_with(name, self._features(hours, dows, clusters, junctions))
+            if reference == "typical":
+                preds = []
+                for k in range(12):
+                    days = np.array([self.typical_days.get(int(j), [self.ref_days] * 12)[k] for j in junctions])
+                    months = np.array([(self._t0 + pd.Timedelta(days=float(d))).month for d in days])
+                    preds.append(self._predict_with(name, self._features(hours, dows, clusters, junctions, days, months)))
+                out = np.mean(preds, axis=0)
+            else:
+                out = self._predict_with(name, self._features(hours, dows, clusters, junctions))
         return np.clip(out, 0, None)
 
     def predict(self, hora, dia, cluster=None, junction=None, model=None):
@@ -164,4 +185,4 @@ class PredictionService:
 
     def status(self):
         return {"trained": self.best_model is not None, "best_model": self.best_model,
-                "metrics": self.metrics, "models": self.models_info()}
+                "metrics": self.metrics, "models": self.models_info(), "reference_date": self.ref_date}

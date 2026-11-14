@@ -92,7 +92,7 @@ function renderMetrics(m) {
 async function loadPredict() {
   const d = await api(`/api/predict?${slot()}`);
   $("pred-value").textContent = `${d.vehicles} veh/h`;
-  $("pred-model").textContent = `model: ${d.model}`;
+  $("pred-model").textContent = d.model === "Historical average" ? `model: ${d.model}` : `model: ${d.model} · traffic level of ${d.reference_date}`;
 }
 
 async function trainPrediction() {

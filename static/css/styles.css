@@ -19,7 +19,7 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
 .hour-cell { height:34px; border-radius:3px; font-size:.62rem; display:flex; align-items:flex-end;
              justify-content:center; color:#fff; padding-bottom:2px; opacity:.85; cursor:pointer; }
 .hour-cell.c-success { background:var(--go); }
-.hour-cell.c-warning { background:var(--wait); color:#3a2c00; }
+.hour-cell.c-warning { background:#e0a526; color:#3a2c00; }
 .hour-cell.c-danger  { background:var(--stop); }
 .hour-cell.c-info    { background:#3a8fb7; }
 .hour-cell.c-primary { background:#4a63c9; }
@@ -40,11 +40,11 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
 .signal { display:flex; gap:5px; background:var(--asphalt); padding:6px 8px; border-radius:20px; }
 .lamp { width:18px; height:18px; border-radius:50%; background:#4a525a; transition:background .2s, box-shadow .2s; }
 .signal.red .lamp-r { background:var(--stop); box-shadow:0 0 8px var(--stop); }
-.signal.yellow .lamp-y { background:var(--wait); box-shadow:0 0 8px var(--wait); }
+.signal.yellow .lamp-y { background:#e0a526; box-shadow:0 0 8px #e0a526; }
 .signal.green .lamp-g { background:var(--go); box-shadow:0 0 8px var(--go); }
 .queue-bar { width:100%; height:10px; background:#e4e7e1; border-radius:5px; overflow:hidden; }
 .queue-fill { height:100%; width:0; background:var(--go); transition:width .4s, background .4s; }
-.queue-fill.mid { background:var(--wait); } .queue-fill.high { background:var(--stop); }
+.queue-fill.mid { background:#e0a526; } .queue-fill.high { background:var(--stop); }
 .cars { display:flex; flex-wrap:wrap; gap:2px; justify-content:center; min-height:14px; max-width:200px; }
 .car { width:10px; height:6px; border-radius:2px; background:#59636b; }
 
