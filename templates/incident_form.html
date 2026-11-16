@@ -1,0 +1,26 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Report an incident{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf, textarea with context %}
+<h1 class="h4 mb-1">Report an incident or give feedback</h1>
+<p class="small text-secondary">Describe what you saw: wrong forecast, unexpected plan, error message or any idea to improve the system.</p>
+<form method="post" class="mini-card" style="max-width:640px" novalidate>
+  {{ csrf() }}
+  <input type="hidden" name="inference_id" value="{{ values.get('inference_id') or '' }}"><input type="hidden" name="plan_id" value="{{ values.get('plan_id') or '' }}">
+  <div class="row g-3 mb-3">
+    <div class="col-md-4"><label class="form-label small" for="kind">Type</label>
+      <select class="form-select form-select-sm" id="kind" name="kind">{% for k in kinds %}<option value="{{ k }}" {% if values.get('kind') == k %}selected{% endif %}>{{ k.replace('_', ' ') }}</option>{% endfor %}</select>
+      {% if errors.get('kind') %}<div class="text-danger small">{{ errors['kind'] }}</div>{% endif %}</div>
+    <div class="col-md-4"><label class="form-label small" for="severity">Severity</label>
+      <select class="form-select form-select-sm" id="severity" name="severity">{% for s in severities %}<option value="{{ s }}" {% if values.get('severity') == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="form-label small" for="intersection_id">Intersection</label>
+      <select class="form-select form-select-sm{% if errors.get('intersection_id') %} is-invalid{% endif %}" id="intersection_id" name="intersection_id"><option value="">Choose…</option>
+        {% for i in inters %}<option value="{{ i.id }}" {% if values.get('intersection_id')|string == i.id|string %}selected{% endif %}>{{ i.code }}</option>{% endfor %}</select>
+      {% if errors.get('intersection_id') %}<div class="invalid-feedback">{{ errors['intersection_id'] }}</div>{% endif %}</div>
+  </div>
+  {{ textarea('description', 'Description', values, errors, 4) }}
+  {% for k in ('inference_id', 'plan_id') %}{% if errors.get(k) %}<div class="text-danger small mb-2">{{ errors[k] }}</div>{% endif %}{% endfor %}
+  <button class="btn btn-dark btn-sm" type="submit">Send</button> <a class="btn btn-outline-secondary btn-sm" href="/incidents">Cancel</a>
+</form>
+{% endblock %}

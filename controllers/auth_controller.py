@@ -1,19 +1,34 @@
+"""Registration, login, logout, roles and request protection (sessions, CSRF, authorization)."""
+import hmac
+import secrets
 from functools import wraps
 from urllib.parse import urlparse
 
-from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
-from werkzeug.security import check_password_hash
+from flask import (Blueprint, abort, flash, g, jsonify, redirect, render_template, request, session, url_for)
 
-USERS = {
-    "erick": ("Erick", "scrypt:32768:8:1$DrmIP6eeCgo6ixoD$9123562472eb4e8c62146c85ae1ce9660f148b2c16570ecb424b5d77ff23d1ce26c5278c056633a5351bd449f803c4f1c9f8b70730c230d307239488ac81f669"),
-    "santiago": ("Santiago", "scrypt:32768:8:1$bC3QeOnGdVu24ijr$f6c9bcc67c741147ba4a52650ae32b27e6fb6b2eb88b6c1d18aaa5849710d278e92ff3a2ec1855354bf625e84c9ef0320f4a3af2db4efbfccf26b2fb0fdc2147"),
-    "ivan": ("Ivan", "scrypt:32768:8:1$CaiVTLSGKIMRtxlP$a5b55813eb68cba2648fc8ed50e88a317d3c85fe87cca7002d75669d938983442cedb1e3c26f604c98a25c2cf565868eba2ef6b16ee8bda152daf21183a2e794"),
-    "edward": ("Edward", "scrypt:32768:8:1$krF47v6uGje5BOiA$bfb9d9cc7bdca14a9063b9e6759aa6997514e8bd9ae0121184bc11ab4f2497625bc496353f7fdcea932320c9a2dd8eddd8bd5f81b0499ba2d4895c9d58bad9ce"),
-}
+from services import accounts
+
+ROLE_LABELS = {"admin": "Administrator", "operator": "Operator", "viewer": "Viewer"}
 
 
 def current_user():
-    return session.get("user")
+    """The logged-in user, read from the database on every request so role changes apply immediately."""
+    if "_user" not in g:
+        user = None
+        uid = session.get("uid")
+        if uid:
+            user = accounts.get_user(uid)
+            if user is None or not user["is_active"]:
+                session.clear()
+                user = None
+        g._user = user
+    return g._user
+
+
+def csrf_token():
+    if "csrf" not in session:
+        session["csrf"] = secrets.token_urlsafe(32)
+    return session["csrf"]
 
 
 def login_required(view):
@@ -25,45 +40,101 @@ def login_required(view):
     return wrapper
 
 
+def roles_required(*roles):
+    """Server-side authorization: the page is refused (403) when the role is not listed."""
+    def decorator(view):
+        @wraps(view)
+        def wrapper(*args, **kwargs):
+            user = current_user()
+            if not user:
+                return redirect(url_for("auth.login", next=request.path))
+            if user["role"] not in roles:
+                abort(403)
+            return view(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def api_login_required():
-    if not current_user():
+    """Used as before_request of the JSON API. Anonymous -> 401. Viewers cannot trigger work (POST) -> 403."""
+    user = current_user()
+    if not user:
         return jsonify({"ok": False, "error": "Login required"}), 401
+    if request.method == "POST" and user["role"] not in ("admin", "operator"):
+        return jsonify({"ok": False, "error": "Your role cannot run this action"}), 403
     return None
 
 
 def _safe_next(target):
     if not target:
-        return url_for("web.dashboard")
+        return url_for("ops.workspace")
     parts = urlparse(target)
-    if parts.scheme or parts.netloc or not target.startswith("/"):
-        return url_for("web.dashboard")
+    if parts.scheme or parts.netloc or not target.startswith("/") or target.startswith("//"):
+        return url_for("ops.workspace")
     return target
 
 
 def create_auth_blueprint():
     bp = Blueprint("auth", __name__)
 
+    @bp.app_context_processor
+    def inject_user():
+        return {"current_user": current_user(), "csrf_token": csrf_token, "role_labels": ROLE_LABELS}
+
+    @bp.before_app_request
+    def csrf_protect():
+        # Forms must carry the token. JSON requests cannot be forged by another site (they need a CORS
+        # preflight), and the /api calls of the dashboard are protected by SameSite cookies and by role.
+        if request.method in ("POST", "PUT", "PATCH", "DELETE") and not request.is_json \
+                and not request.path.startswith("/api/"):
+            sent = request.form.get("csrf_token") or request.headers.get("X-CSRF-Token") or ""
+            expected = session.get("csrf", "")
+            if not sent or not expected or not hmac.compare_digest(sent, expected):
+                abort(400, "Invalid or missing security token. Reload the page and try again.")
+
+    @bp.route("/register", methods=["GET", "POST"])
+    def register():
+        if current_user():
+            return redirect(url_for("ops.workspace"))
+        values, errors = {}, {}
+        if request.method == "POST":
+            values, errors = accounts.validate_registration(request.form)
+            if not errors:
+                # The role is always "viewer": it is never taken from the request.
+                uid = accounts.create_user(values["username"], values["full_name"], values["email"],
+                                           values["password"], role="viewer")
+                session.clear()
+                session["uid"] = uid
+                flash("Your account was created with the Viewer role. An administrator can grant more access.", "success")
+                return redirect(url_for("ops.workspace"))
+            values.pop("password", None)
+        return render_template("register.html", values=values, errors=errors)
+
     @bp.route("/login", methods=["GET", "POST"])
     def login():
         next_url = request.values.get("next", "")
         if current_user():
             return redirect(_safe_next(next_url))
-        error = None
-        username = ""
+        error, username = None, ""
         if request.method == "POST":
-            username = request.form.get("username", "").strip()
-            password = request.form.get("password", "")
-            user = USERS.get(username.lower())
-            if user and check_password_hash(user[1], password):
+            data = request.get_json(silent=True) if request.is_json else request.form
+            data = data or {}
+            username = (data.get("username") or "").strip()
+            user, error = accounts.authenticate(username, data.get("password") or "")
+            if user:
                 session.clear()
-                session["user"] = user[0]
+                session["uid"] = user["id"]
+                if request.is_json:      # lets scripts and curl obtain a session cookie for the JSON API
+                    return jsonify({"ok": True, "role": user["role"]})
                 return redirect(_safe_next(next_url))
-            error = "Incorrect username or password."
+            if request.is_json:
+                return jsonify({"ok": False, "error": error}), 401
         return render_template("login.html", error=error, next_url=next_url, username=username)
 
-    @bp.route("/logout")
+    @bp.route("/logout", methods=["POST"])
     def logout():
         session.clear()
+        flash("You have logged out.", "info")
         return redirect(url_for("web.home"))
 
     return bp

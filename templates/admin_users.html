@@ -1,0 +1,22 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Users and roles{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf with context %}
+<h1 class="h4 mb-1">Users and roles</h1>
+<p class="small text-secondary">Only administrators see this page. Nobody can change their own role or disable their own account, and one active administrator must always remain.</p>
+<div class="table-responsive"><table class="table table-sm crisp-table align-middle">
+  <thead><tr><th>#</th><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Last login</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr><td>{{ u.id }}</td><td>{{ u.full_name }}</td><td>{{ u.username }}</td><td>{{ u.email }}</td>
+    <td>{% if u.id == current_user.id %}{{ role_labels[u.role] }} (you){% else %}
+      <form method="post" action="/admin/users/{{ u.id }}/role" class="d-flex gap-1">{{ csrf() }}
+        <select class="form-select form-select-sm" name="role">{% for r in ('admin', 'operator', 'viewer') %}<option value="{{ r }}" {% if u.role == r %}selected{% endif %}>{{ role_labels[r] }}</option>{% endfor %}</select>
+        <button class="btn btn-outline-dark btn-sm" type="submit">Save</button></form>{% endif %}</td>
+    <td>{% if u.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-secondary">Disabled</span>{% endif %}</td>
+    <td>{{ u.last_login or '-' }}</td>
+    <td>{% if u.id != current_user.id %}<form method="post" action="/admin/users/{{ u.id }}/active">{{ csrf() }}<input type="hidden" name="active" value="{{ 0 if u.is_active else 1 }}"><button class="btn btn-outline-secondary btn-sm" type="submit">{{ 'Disable' if u.is_active else 'Enable' }}</button></form>{% endif %}</td></tr>
+  {% endfor %}
+  </tbody></table></div>
+{% endblock %}

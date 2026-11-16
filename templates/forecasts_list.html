@@ -1,0 +1,29 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Forecast history{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="h4 mb-0">Forecast history <span class="small text-secondary">({{ 'all users' if current_user.role == 'admin' else 'yours' }})</span></h1>
+  <form method="get" class="d-flex gap-2">
+    <select class="form-select form-select-sm" name="intersection_id" onchange="this.form.submit()">
+      <option value="">All intersections</option>
+      {% for i in inters %}<option value="{{ i.id }}" {% if selected == i.id %}selected{% endif %}>{{ i.code }}</option>{% endfor %}
+    </select>
+    <a class="btn btn-dark btn-sm text-nowrap" href="/forecasts/new">New forecast</a>
+  </form>
+</div>
+<div class="table-responsive">
+<table class="table table-sm crisp-table align-middle">
+  <thead><tr><th>#</th><th>Requested</th><th>User</th><th>Intersection</th><th>Target hour</th><th class="text-end">Forecast (veh/h)</th><th>Group</th><th>Model version</th><th class="text-end">Latency</th><th class="text-end">Observed</th><th class="text-end">Error</th></tr></thead>
+  <tbody>
+  {% for f in rows %}
+  <tr>
+    <td><a href="/forecasts/{{ f.id }}">{{ f.id }}</a></td><td>{{ f.created_at }}</td><td>{{ f.author_username }}</td><td>{{ f.inter_code }}</td>
+    <td>{{ f.target_datetime }}</td><td class="text-end">{{ f.predicted_vehicles }}</td><td>{{ f.group_label }}</td><td>{{ f.model_version }}</td>
+    <td class="text-end">{{ f.latency_ms }} ms</td><td class="text-end">{{ f.observed_vehicles if f.observed_vehicles is not none else '-' }}</td><td class="text-end">{{ f.abs_error if f.abs_error is not none else '-' }}</td>
+  </tr>
+  {% else %}<tr><td colspan="11" class="text-secondary">No forecasts yet.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "app_base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <div class="display-4 fw-semibold">{{ code }}</div>
+  <h1 class="h4">{{ title }}</h1>
+  <p class="text-secondary">{{ text }}</p>
+  <a class="btn btn-dark btn-sm" href="/">Back to Home</a>
+</div>
+{% endblock %}

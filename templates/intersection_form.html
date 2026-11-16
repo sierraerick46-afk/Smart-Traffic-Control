@@ -1,0 +1,24 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}{{ 'Edit' if inter else 'New' }} intersection{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf, field, textarea with context %}
+<h1 class="h4 mb-3">{{ 'Edit ' ~ inter.code if inter else 'Add an intersection' }}</h1>
+<form method="post" class="row g-3" style="max-width:720px" novalidate>
+  {{ csrf() }}
+  <div class="col-md-4">{{ field('code', 'Code', values, errors, help='For example CHIA-005') }}</div>
+  <div class="col-md-8">{{ field('name', 'Name', values, errors) }}</div>
+  <div class="col-md-4">
+    <div class="mb-3"><label class="form-label small" for="junction">Junction (historical series)</label>
+    <input class="form-control form-control-sm{% if errors.get('junction') %} is-invalid{% endif %}" id="junction" name="junction" value="{{ values.get('junction') if values.get('junction') is not none else '' }}" placeholder="optional">
+    {% if errors.get('junction') %}<div class="invalid-feedback">{{ errors['junction'] }}</div>{% else %}<div class="form-text">Available: {{ junctions|join(', ') }}</div>{% endif %}</div>
+  </div>
+  <div class="col-md-4">{{ field('phases', 'Phases', values, errors, type='number', attrs='min="2" max="8"') }}</div>
+  <div class="col-md-4">{{ field('speed_limit_kmh', 'Speed limit (km/h)', values, errors, type='number', attrs='min="10" max="120"') }}</div>
+  <div class="col-md-6">{{ field('latitude', 'Latitude', values, errors, attrs='inputmode="decimal"') }}</div>
+  <div class="col-md-6">{{ field('longitude', 'Longitude', values, errors, attrs='inputmode="decimal"') }}</div>
+  <div class="col-12">{{ textarea('notes', 'Notes', values, errors, 2) }}</div>
+  <div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {% if values.get('is_active') %}checked{% endif %}> <label class="form-check-label small" for="is_active">Active</label></div>
+  <div class="col-12"><button class="btn btn-dark btn-sm" type="submit">Save</button> <a class="btn btn-outline-secondary btn-sm" href="/intersections">Cancel</a></div>
+</form>
+{% endblock %}
