@@ -386,5 +386,6 @@ def test_team_members_get_operator_and_viewer_accounts(client, app):
                 ("erick", "erick_operator", "erick_viewer", "ivan_operator", "ivan_viewer")}
     assert rows["erick"]["role"] == "admin"
     assert rows["erick_operator"]["role"] == "operator" and rows["erick_viewer"]["role"] == "viewer"
-    assert rows["ivan_operator"] is None and rows["ivan_viewer"] is None
+    assert rows["ivan_operator"]["role"] == "operator" and rows["ivan_viewer"]["role"] == "viewer"
+    assert login(client, "ivan_viewer", "ivan12345").status_code == 302
     assert login(client, "erick_operator", "Erick12345").status_code == 302
