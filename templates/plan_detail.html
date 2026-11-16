@@ -1,0 +1,50 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Plan {{ p.id }}{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf, field, textarea, plan_badge with context %}
+<a class="small" href="/plans">← Timing plans</a>
+<h1 class="h4 mt-2 mb-3">Plan #{{ p.id }} · {{ p.inter_name }} {{ plan_badge(p.status) }}</h1>
+<div class="row g-3">
+  <div class="col-lg-6"><div class="mini-card"><h3>Plan</h3>
+    <table class="table table-sm small mb-0">
+      <tr><td>Intersection</td><td>{{ p.inter_code }} · {{ p.inter_name }}</td></tr>
+      <tr><td>Target hour</td><td>{{ p.target_datetime }}</td></tr>
+      <tr><td>Forecast</td><td>{{ p.predicted_vehicles }} veh/h ({{ p.group_label }}) · model {{ p.model_version }} · <a href="/forecasts/{{ p.inference_id }}">forecast #{{ p.inference_id }}</a></td></tr>
+      <tr><td>Green proposed by the rule</td><td>{{ p.model_green_s }} s</td></tr>
+      <tr><td>Final green time</td><td><b>{{ p.final_green_s }} s</b></td></tr>
+      <tr><td>Justification</td><td>{{ p.rationale or '-' }}</td></tr>
+      <tr><td>Author</td><td>{{ p.creator }} · {{ p.created_at }}</td></tr>
+      {% if p.decided_at %}<tr><td>Decision</td><td>{{ p.decider }} · {{ p.decided_at }}<br>{{ p.decision_note or '' }}</td></tr>{% endif %}
+      {% if p.applied_at %}<tr><td>Applied</td><td>{{ p.applied_at }}</td></tr>{% endif %}
+    </table></div></div>
+  <div class="col-lg-6">
+    {% if can_edit %}
+    <form method="post" action="/plans/{{ p.id }}/edit" class="mini-card mb-3" novalidate>
+      <h3>Edit draft</h3>{{ csrf() }}
+      {{ field('final_green_s', 'Green time (seconds)', values, errors, type='number', attrs='min="%d" max="%d"'|format(limits[0], limits[1])) }}
+      {{ textarea('rationale', 'Justification', values, errors, 2) }}
+      <button class="btn btn-outline-dark btn-sm" type="submit">Save changes</button>
+    </form>
+    {% endif %}
+    <div class="mini-card"><h3>Workflow</h3>
+      {% if p.status == 'draft' and owner %}
+      <form method="post" action="/plans/{{ p.id }}/transition" class="d-inline">{{ csrf() }}<input type="hidden" name="action" value="submit"><button class="btn btn-dark btn-sm">Submit for approval</button></form>
+      <form method="post" action="/plans/{{ p.id }}/delete" class="d-inline" onsubmit="return confirm('Delete this draft?');">{{ csrf() }}<button class="btn btn-outline-danger btn-sm">Delete draft</button></form>
+      {% elif p.status == 'pending' %}
+        {% if current_user.role == 'admin' %}
+        <form method="post" action="/plans/{{ p.id }}/transition">{{ csrf() }}
+          <textarea class="form-control form-control-sm mb-2" name="note" rows="2" placeholder="Decision note (required to reject)"></textarea>
+          <button class="btn btn-success btn-sm" name="action" value="approve">Approve</button>
+          <button class="btn btn-danger btn-sm" name="action" value="reject">Reject</button></form>
+        {% else %}<p class="small text-secondary mb-0">Waiting for an administrator.</p>{% endif %}
+      {% elif p.status == 'approved' and owner %}
+      <form method="post" action="/plans/{{ p.id }}/transition">{{ csrf() }}<input type="hidden" name="action" value="apply"><button class="btn btn-primary btn-sm">Mark as applied</button></form>
+      {% elif p.status == 'rejected' and owner %}
+      <form method="post" action="/plans/{{ p.id }}/transition">{{ csrf() }}<input type="hidden" name="action" value="reopen"><button class="btn btn-outline-dark btn-sm">Reopen as draft</button></form>
+      {% else %}<p class="small text-secondary mb-0">No actions available for you at this step.</p>{% endif %}
+      <hr><a class="small" href="/incidents/new?intersection_id={{ p.intersection_id }}&plan_id={{ p.id }}">Report a problem with this plan</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

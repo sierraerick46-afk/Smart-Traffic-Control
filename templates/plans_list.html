@@ -1,0 +1,25 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Timing plans{% endblock %}
+{% block content %}
+{% from "_macros.html" import plan_badge with context %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="h4 mb-0">Timing plans</h1>
+  <form method="get"><select class="form-select form-select-sm" name="status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for k, v in labels.items() %}<option value="{{ k }}" {% if status == k %}selected{% endif %}>{{ v }}</option>{% endfor %}
+  </select></form>
+</div>
+<div class="table-responsive">
+<table class="table table-sm crisp-table align-middle">
+  <thead><tr><th>#</th><th>Intersection</th><th>Target hour</th><th class="text-end">Forecast</th><th class="text-end">Model green</th><th class="text-end">Final green</th><th>Author</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for p in rows %}
+  <tr><td><a href="/plans/{{ p.id }}">{{ p.id }}</a></td><td>{{ p.inter_code }} · {{ p.inter_name }}</td><td>{{ p.target_datetime }}</td>
+      <td class="text-end">{{ p.predicted_vehicles }}</td><td class="text-end">{{ p.model_green_s }} s</td><td class="text-end">{{ p.final_green_s }} s</td><td>{{ p.creator }}</td><td>{{ plan_badge(p.status) }}</td></tr>
+  {% else %}<tr><td colspan="8" class="text-secondary">No plans to show.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="small text-secondary">{% if current_user.role == 'viewer' %}Viewers see approved and applied plans only.{% elif current_user.role == 'operator' %}You see your own plans and the approved or applied plans of others.{% else %}Administrators see every plan.{% endif %}</p>
+{% endblock %}

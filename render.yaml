@@ -4,6 +4,34 @@ services:
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smart-traffic-db
+          property: connectionString
+      # Secrets: set these two (and TEST_USERS_PASSWORD) in the Render dashboard, not in this file.
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: TEST_USERS_PASSWORD
+        sync: false
+      - key: ERICK_PASSWORD
+        sync: false
+      - key: SANTIAGO_PASSWORD
+        sync: false
+      - key: IVAN_PASSWORD
+        sync: false
+      - key: EDWARD_PASSWORD
+        sync: false
+
+databases:
+  - name: smart-traffic-db
+    plan: free

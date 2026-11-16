@@ -1,0 +1,30 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h1 class="h4 mb-1">Reports and indicators</h1>
+<p class="small text-secondary">{{ 'All users.' if current_user.role == 'admin' else 'Forecast figures include only your own forecasts.' }}</p>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="mini-card"><div class="small text-secondary">Forecasts</div><div class="h3 mb-0">{{ r.inferences }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="mini-card"><div class="small text-secondary">With real outcome</div><div class="h3 mb-0">{{ r.with_outcome }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="mini-card"><div class="small text-secondary">MAE vs outcomes (veh/h)</div><div class="h3 mb-0">{{ r.mae if r.mae is not none else '-' }}</div>{% if r.wape is not none %}<div class="small text-secondary">{{ r.wape }}% of observed volume</div>{% endif %}</div></div>
+  <div class="col-6 col-lg-3"><div class="mini-card"><div class="small text-secondary">Response time</div><div class="h3 mb-0">{{ r.latency_mean if r.latency_mean is not none else '-' }} ms</div><div class="small text-secondary">p95 {{ r.latency_p95 if r.latency_p95 is not none else '-' }} ms</div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-7"><div class="mini-card"><h3>By intersection</h3>
+    <table class="table table-sm small mb-0"><thead><tr><th>Intersection</th><th class="text-end">Forecasts</th><th class="text-end">Mean forecast</th><th class="text-end">MAE</th></tr></thead><tbody>
+    {% for i in r.by_intersection %}<tr><td>{{ i.code }} · {{ i.name }}</td><td class="text-end">{{ i.n }}</td><td class="text-end">{{ i.avg_pred if i.avg_pred is not none else '-' }}</td><td class="text-end">{{ i.mae if i.mae is not none else '-' }}</td></tr>{% endfor %}
+    </tbody></table></div></div>
+  <div class="col-lg-5"><div class="mini-card"><h3>Timing plans</h3>
+    <table class="table table-sm small mb-2"><tbody>
+    {% for s in ('draft', 'pending', 'approved', 'applied', 'rejected') %}<tr><td>{{ s|capitalize }}</td><td class="text-end">{{ r.plans.get(s, 0) }}</td></tr>{% endfor %}
+    </tbody></table>
+    <p class="small mb-0">Approval rate: <b>{{ (r.approval_rate ~ '%') if r.approval_rate is not none else '-' }}</b> · mean adjustment to the proposal: <b>{{ r.mean_adjustment if r.mean_adjustment is not none else '-' }} s</b></p></div></div>
+  <div class="col-lg-6"><div class="mini-card"><h3>Incidents</h3>
+    <p class="small mb-1">Open: <b>{{ r.incidents.get('open', 0) }}</b> · In review: <b>{{ r.incidents.get('in_review', 0) }}</b> · Closed: <b>{{ r.incidents.get('closed', 0) }}</b></p>
+    <p class="small mb-0">Open by severity: {% for s in ('high', 'medium', 'low') %}{{ s }} <b>{{ r.incidents_open_by_severity.get(s, 0) }}</b>{% if not loop.last %} · {% endif %}{% endfor %}</p></div></div>
+  <div class="col-lg-6"><div class="mini-card"><h3>Forecasts per day (last 14 days with activity)</h3>
+    {% if r.per_day %}<table class="table table-sm small mb-0"><tbody>{% for d in r.per_day %}<tr><td>{{ d.day }}</td><td class="text-end">{{ d.n }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="small text-secondary mb-0">No forecasts yet.</p>{% endif %}</div></div>
+</div>
+{% endblock %}

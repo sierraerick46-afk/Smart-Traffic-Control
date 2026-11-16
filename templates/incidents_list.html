@@ -1,0 +1,19 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Incidents and feedback{% endblock %}
+{% block content %}
+{% from "_macros.html" import inc_badge with context %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="h4 mb-0">Incidents and feedback</h1>
+  <form method="get" class="d-flex gap-2"><select class="form-select form-select-sm" name="status" onchange="this.form.submit()">
+    <option value="">All statuses</option>{% for s in ('open', 'in_review', 'closed') %}<option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s.replace('_', ' ') }}</option>{% endfor %}</select>
+    <a class="btn btn-dark btn-sm text-nowrap" href="/incidents/new">Report</a></form>
+</div>
+<div class="table-responsive"><table class="table table-sm crisp-table align-middle">
+  <thead><tr><th>#</th><th>Created</th><th>Type</th><th>Severity</th><th>Intersection</th><th>Reported by</th><th>Description</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for n in rows %}<tr><td><a href="/incidents/{{ n.id }}">{{ n.id }}</a></td><td>{{ n.created_at }}</td><td>{{ n.kind.replace('_', ' ') }}</td><td>{{ n.severity }}</td><td>{{ n.inter_code }}</td><td>{{ n.reporter }}</td><td>{{ n.description[:80] }}{{ '…' if n.description|length > 80 }}</td><td>{{ inc_badge(n.status) }}</td></tr>
+  {% else %}<tr><td colspan="8" class="text-secondary">No reports to show.</td></tr>{% endfor %}
+  </tbody></table></div>
+<p class="small text-secondary">{% if current_user.role == 'admin' %}Administrators see every report.{% else %}You see the reports you sent or that were assigned to you.{% endif %}</p>
+{% endblock %}

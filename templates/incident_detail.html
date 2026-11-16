@@ -1,0 +1,33 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Incident {{ n.id }}{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf, inc_badge with context %}
+<a class="small" href="/incidents">← Incidents and feedback</a>
+<h1 class="h4 mt-2 mb-3">Report #{{ n.id }} {{ inc_badge(n.status) }}</h1>
+<div class="row g-3">
+  <div class="col-lg-6"><div class="mini-card"><table class="table table-sm small mb-0">
+    <tr><td>Type · severity</td><td>{{ n.kind.replace('_', ' ') }} · {{ n.severity }}</td></tr>
+    <tr><td>Intersection</td><td>{{ n.inter_code }} · {{ n.inter_name }}</td></tr>
+    <tr><td>Reported by</td><td>{{ n.reporter }} · {{ n.created_at }}</td></tr>
+    <tr><td>Assigned to</td><td>{{ n.assignee or '-' }}</td></tr>
+    {% if n.inference_id %}<tr><td>Forecast</td><td>#{{ n.inference_id }}</td></tr>{% endif %}
+    {% if n.plan_id %}<tr><td>Plan</td><td><a href="/plans/{{ n.plan_id }}">#{{ n.plan_id }}</a></td></tr>{% endif %}
+    <tr><td>Description</td><td>{{ n.description }}</td></tr>
+    <tr><td>Resolution</td><td>{{ n.resolution or '-' }}</td></tr>
+  </table></div></div>
+  {% if current_user.role in ('admin', 'operator') %}
+  <div class="col-lg-6"><form method="post" class="mini-card">
+    <h3>Follow-up</h3>{{ csrf() }}
+    <div class="mb-2"><label class="form-label small" for="status">Status</label>
+      <select class="form-select form-select-sm" id="status" name="status">{% for s in statuses %}<option value="{{ s }}" {% if n.status == s %}selected{% endif %}>{{ s.replace('_', ' ') }}</option>{% endfor %}</select></div>
+    {% if staff %}<div class="mb-2"><label class="form-label small" for="assigned_to">Assign to</label>
+      <select class="form-select form-select-sm" id="assigned_to" name="assigned_to"><option value="">Nobody</option>{% for u in staff %}<option value="{{ u.id }}" {% if n.assigned_to == u.id %}selected{% endif %}>{{ u.full_name }}</option>{% endfor %}</select></div>{% endif %}
+    <div class="mb-3"><label class="form-label small" for="resolution">Resolution</label><textarea class="form-control form-control-sm" id="resolution" name="resolution" rows="3">{{ n.resolution or '' }}</textarea><div class="form-text">Required to close the report.</div></div>
+    <button class="btn btn-dark btn-sm" type="submit">Save</button>
+  </form>
+  {% if current_user.role == 'admin' %}<form method="post" action="/incidents/{{ n.id }}/delete" class="mt-2" onsubmit="return confirm('Delete this report?');">{{ csrf() }}<button class="btn btn-outline-danger btn-sm">Delete report</button></form>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

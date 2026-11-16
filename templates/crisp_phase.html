@@ -55,7 +55,7 @@
 
   <nav class="crisp-pager mt-5" aria-label="Phase navigation">
     {% if prev_p %}<a href="/crisp-ml/{{ prev_p.num }}"><small>← Previous</small>Phase {{ prev_p.num }} · {{ prev_p.title }}</a>{% else %}<a href="/crisp-ml"><small>← Back</small>CRISP-ML overview</a>{% endif %}
-    {% if next_p %}<a class="text-end" href="/crisp-ml/{{ next_p.num }}"><small>Next →</small>Phase {{ next_p.num }} · {{ next_p.title }}</a>{% else %}<a class="text-end" href="/demo"><small>Next →</small>Open the model demo</a>{% endif %}
+    {% if next_p %}<a class="text-end" href="/crisp-ml/{{ next_p.num }}"><small>Next →</small>Phase {{ next_p.num }} · {{ next_p.title }}</a>{% else %}<a class="text-end" href="/app"><small>Next →</small>Open the information system</a>{% endif %}
   </nav>
 
   {% include "_crisp_refs.html" %}

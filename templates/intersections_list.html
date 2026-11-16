@@ -1,0 +1,33 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Intersections{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf with context %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">Intersections</h1>
+  {% if current_user.role == 'admin' %}<a class="btn btn-dark btn-sm" href="/intersections/new">Add intersection</a>{% endif %}
+</div>
+<div class="table-responsive">
+<table class="table table-sm crisp-table align-middle">
+  <thead><tr><th>Code</th><th>Name</th><th>Junction</th><th>Phases</th><th>Speed limit</th><th>Location</th><th>Forecasts</th><th>Plans</th><th>Incidents</th><th>Status</th>{% if current_user.role == 'admin' %}<th></th>{% endif %}</tr></thead>
+  <tbody>
+  {% for i in rows %}
+  <tr>
+    <td>{{ i.code }}</td><td>{{ i.name }}</td><td>{{ i.junction if i.junction is not none else '-' }}</td><td>{{ i.phases }}</td>
+    <td>{{ i.speed_limit_kmh ~ ' km/h' if i.speed_limit_kmh else '-' }}</td>
+    <td>{% if i.latitude is not none and i.longitude is not none %}<a class="btn btn-sm btn-outline-primary py-0" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ i.latitude }},{{ i.longitude }}">📍 Map</a>{% else %}-{% endif %}</td>
+    <td>{{ i.forecasts }}</td><td>{{ i.plans }}</td><td>{{ i.incidents }}</td>
+    <td>{% if i.is_active %}<span class="badge text-bg-success">Active</span>{% else %}<span class="badge text-bg-secondary">Disabled</span>{% endif %}</td>
+    {% if current_user.role == 'admin' %}
+    <td class="text-nowrap">
+      <a class="btn btn-outline-dark btn-sm py-0" href="/intersections/{{ i.id }}/edit">Edit</a>
+      <form method="post" action="/intersections/{{ i.id }}/delete" class="d-inline" onsubmit="return confirm('Delete {{ i.code }}?');">{{ csrf() }}<button class="btn btn-outline-danger btn-sm py-0" type="submit">Delete</button></form>
+    </td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="small text-secondary">Only intersections linked to a junction with historical counts can be forecast. The speed limit is the national urban reference (50 km/h) unless the local signage says otherwise.</p>
+{% endblock %}

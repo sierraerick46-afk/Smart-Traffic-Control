@@ -1,0 +1,27 @@
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro field(name, label, values, errors, type='text', help='', attrs='') %}
+<div class="mb-3">
+  <label class="form-label small" for="{{ name }}">{{ label }}</label>
+  <input class="form-control form-control-sm{% if errors.get(name) %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ values.get(name) if values.get(name) is not none else '' }}" {{ attrs|safe }}>
+  {% if errors.get(name) %}<div class="invalid-feedback">{{ errors[name] }}</div>{% elif help %}<div class="form-text">{{ help }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro textarea(name, label, values, errors, rows=3, help='') %}
+<div class="mb-3">
+  <label class="form-label small" for="{{ name }}">{{ label }}</label>
+  <textarea class="form-control form-control-sm{% if errors.get(name) %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" rows="{{ rows }}">{{ values.get(name) or '' }}</textarea>
+  {% if errors.get(name) %}<div class="invalid-feedback">{{ errors[name] }}</div>{% elif help %}<div class="form-text">{{ help }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro plan_badge(status) %}
+{% set c = {'draft': 'secondary', 'pending': 'warning', 'approved': 'success', 'rejected': 'danger', 'applied': 'primary'} %}
+<span class="badge text-bg-{{ c.get(status, 'secondary') }}">{{ {'draft': 'Draft', 'pending': 'Pending approval', 'approved': 'Approved', 'rejected': 'Rejected', 'applied': 'Applied'}.get(status, status) }}</span>
+{% endmacro %}
+
+{% macro inc_badge(status) %}
+{% set c = {'open': 'danger', 'in_review': 'warning', 'closed': 'success'} %}
+<span class="badge text-bg-{{ c.get(status, 'secondary') }}">{{ status.replace('_', ' ') }}</span>
+{% endmacro %}

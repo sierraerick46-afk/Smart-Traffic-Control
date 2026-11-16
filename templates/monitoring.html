@@ -1,0 +1,26 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Monitoring{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">Monitoring</h1>
+{% if m.alerts %}{% for a in m.alerts %}<div class="alert alert-warning py-2 small">{{ a }}</div>{% endfor %}
+{% else %}<div class="alert alert-success py-2 small">No alerts: the checks below are within their thresholds.</div>{% endif %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="mini-card"><div class="small text-secondary">Live MAE (last {{ m.outcomes }} outcomes)</div><div class="h3 mb-0">{{ m.live_mae if m.live_mae is not none else '-' }}</div>
+    <div class="small text-secondary">alert above {{ m.threshold if m.threshold else '-' }} (needs {{ m.min_outcomes }} outcomes)</div></div></div>
+  <div class="col-md-3"><div class="mini-card"><div class="small text-secondary">Requests far from training data</div><div class="h3 mb-0">{{ (m.far_share * 100)|round(0)|int }}%</div><div class="small text-secondary">alert above {{ thresholds.range }}%</div></div></div>
+  <div class="col-md-3"><div class="mini-card"><div class="small text-secondary">Latency p95</div><div class="h3 mb-0">{{ m.latency_p95 if m.latency_p95 is not none else '-' }} ms</div><div class="small text-secondary">alert above {{ thresholds.latency }} ms</div></div></div>
+  <div class="col-md-3"><div class="mini-card"><div class="small text-secondary">Errors logged</div><div class="h3 mb-0">{{ m.errors }}</div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-5"><div class="mini-card"><h3>Model versions</h3>
+    <table class="table table-sm small mb-0"><thead><tr><th>Version</th><th>Model</th><th class="text-end">R²</th><th class="text-end">MAE</th><th></th></tr></thead><tbody>
+    {% for v in m.versions %}<tr><td>{{ v.version }}</td><td>{{ v.model_name }}</td><td class="text-end">{{ v.test_r2 }}</td><td class="text-end">{{ v.test_mae }}</td><td>{% if v.is_current %}<span class="badge text-bg-success">current</span>{% endif %}</td></tr>{% endfor %}
+    </tbody></table>
+    <p class="small text-secondary mt-2 mb-0">A new version is registered automatically when <code>python train.py</code> writes a new artifact and the application starts.</p></div></div>
+  <div class="col-lg-7"><div class="mini-card"><h3>Recent events</h3>
+    <div class="table-responsive" style="max-height:340px;overflow:auto"><table class="table table-sm small mb-0"><thead><tr><th>Time</th><th>Level</th><th>Event</th><th>Endpoint</th><th class="text-end">ms</th><th>Detail</th></tr></thead><tbody>
+    {% for l in m.recent_logs %}<tr><td>{{ l.created_at }}</td><td>{{ l.level }}</td><td>{{ l.event }}</td><td>{{ l.endpoint or '' }}</td><td class="text-end">{{ l.latency_ms if l.latency_ms is not none else '' }}</td><td>{{ (l.detail or '')[:60] }}</td></tr>{% endfor %}
+    </tbody></table></div></div></div>
+</div>
+{% endblock %}

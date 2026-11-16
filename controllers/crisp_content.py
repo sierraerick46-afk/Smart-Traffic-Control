@@ -14,7 +14,7 @@ PHASES = [
     {"num": 4, "slug": "model-evaluation", "title": "Model evaluation", "color": "#d64545",
      "summary": "Metrics, cross-validation, comparison, risks, expert review and the final result on an independent test set."},
     {"num": 5, "slug": "model-deployment", "title": "Model deployment", "color": "#4a63c9",
-     "summary": "The saved model, a working demo, its inputs and outputs, and how it plugs into the dashboard and simulation."},
+     "summary": "The saved model, the information system that uses it, its inputs and outputs, roles, and how it plugs into the dashboard and simulation."},
     {"num": 6, "slug": "monitoring-and-maintenance", "title": "Monitoring and maintenance", "color": "#6b7a72",
      "summary": "Indicators, drift detection, responsibilities, retraining rules and a labelled monitoring test."},
 ]
@@ -138,7 +138,7 @@ def _phase1(rep, q, fam, fin, sp, sel, test, base, names, gain, mon, ctl):
              ["R² on the independent test set (requested by the course professor)", "≥ 0.80", f"{test['r2']}", "✓" if test["r2"] >= 0.8 else "✗"],
              ["MAE reduction vs the seasonal-mean baseline", "≥ 30%", f"{gain:.0f}% ({base['mae']} → {test['mae']} veh/h)", "✓" if gain >= 30 else "✗"],
              ["Queue reduction of the agent vs a fixed 30 s signal (simulation)", "≥ 10%", ctl_txt, "✓" if (ctl and ctl["improvement_mean"] >= 10) else "–"],
-             ["Prediction available through the web demo and API", "working", "/demo and POST /v1/forecast", "✓"]]}]},
+             ["Prediction available inside the information system and through the API", "working", "/forecasts/new and POST /v1/forecast (login required)", "✓"]]}]},
     ]}
 
 
@@ -340,37 +340,42 @@ def _phase5(rep, q, fam, fin, sp, sel, test, base, names, gain, mon, ctl):
              ["artifacts/control_evaluation.json", "Agent vs fixed-time evaluation (5 trainings)"]]}],
          "code": "python train.py      # rebuilds every artifact and figure (about 4 minutes on a laptop)\npython monitor.py    # monitoring test with simulated operational data"},
         {"title": "Functional demonstration",
-         "paragraphs": ["The <a href=\"/demo\">Demo page</a> accepts a new date, hour and intersection and returns the forecast, "
-                        "the type of moment and the 24-hour curve of that day. It is public, so it can be tested without logging in."],
+         "paragraphs": ["After logging in as an operator or administrator, the <a href=\"/forecasts/new\">New forecast</a> page accepts a "
+                        "date, hour and intersection and returns the forecast, the type of moment and the 24-hour curve of that day. "
+                        "Every result is saved in the forecast history with the user, the date and the model version, and it can be turned "
+                        "into a timing plan that an administrator approves."],
          "figures": [fig("demo_evidence.png", "Deployment evidence: the demo answering a new input with the saved model.")]
          if os.path.exists(os.path.join(ROOT, "static", "img", "crisp", "demo_evidence.png")) else []},
         {"title": "Inputs, outputs, dependencies and execution",
          "tables": [{"head": ["Item", "Detail"], "rows": [
              ["Input", "date (YYYY-MM-DD), hour (0–23), junction (1–4) — or datetime"],
              ["Output", "vehicles_per_hour, group, hourly_curve (24 values), model, model_version, notes"],
-             ["API", "POST /v1/forecast (JSON), POST /v1/feedback, GET /v1/monitoring"],
+             ["API", "POST /v1/forecast (JSON, operators and administrators), GET /v1/monitoring (administrators), GET /health (public)"],
              ["Dependencies", "Python 3.12, Flask, gunicorn, pandas, NumPy, scikit-learn 1.9.1 (pinned for the saved model), PyTorch (CPU), joblib, matplotlib (training only)"],
              ["Run locally", "pip install -r requirements.txt → python app.py → http://localhost:5000"],
              ["Production", "gunicorn app:app on Render (render.yaml)"]]}],
-         "code": "curl -X POST https://<app>/v1/forecast -H \"Content-Type: application/json\" \\\n     -d '{\"date\": \"2017-06-12\", \"hour\": 8, \"junction\": 1}'"},
+         "code": "# the API uses the session cookie of a logged-in operator or administrator\ncurl -X POST https://<app>/v1/forecast -H \"Content-Type: application/json\" -b cookies.txt \\\n     -d '{\"date\": \"2017-06-12\", \"hour\": 8, \"intersection_id\": 1}'"},
         {"title": "Initial user instructions",
-         "bullets": ["Open the Demo, choose date, hour and intersection, press Predict.",
-                     "Read the expected vehicles per hour and the group; the bar chart shows the whole day.",
-                     "If the value looks wrong, use the Feedback form (type Incident) and describe what you observed.",
-                     "Team members log in to use the Dashboard (training and comparison) and the Simulation."]},
-        {"title": "Integration with the information system (Activity 2)",
-         "bullets": ["Done: the Dashboard and the Simulation load the same artifacts/model.joblib through <code>PredictionService</code>; "
+         "bullets": ["Register or log in. New accounts are Viewers; an administrator can make you an Operator.",
+                     "Operators open Operations → New forecast, choose intersection, date and hour, and press Run forecast.",
+                     "Read the expected vehicles per hour and the group; the bar chart shows the whole day. Create a timing plan from the forecast.",
+                     "Submit the plan; an administrator approves or rejects it. Approved plans are marked as applied.",
+                     "When the real count is known, record it in the forecast to measure the error.",
+                     "If something looks wrong, use Operations → Incidents and feedback."]},
+        {"title": "Integration with the information system (Activity 3)",
+         "bullets": ["Done: the Dashboard, the Simulation and the forecast module load the same artifacts/model.joblib through <code>PredictionService</code>; "
                      "the simulator uses the forecast as the arrival rate of the DQN agent.",
-                     "Done: the JSON API lets other modules (or the mobility office) request forecasts.",
+                     "Done: users, roles, intersections, forecasts, timing plans, incidents and logs are stored in a database (SQLite, or PostgreSQL through DATABASE_URL).",
+                     "Done: the JSON API lets authorized users request forecasts that are saved in the same history.",
                      "Next: a monthly job runs train.py with the new counts, stores the new artifact with its version and replaces the "
                      "current one only if it is better on the latest month (phase 6).",
                      "Next: replace the public dataset with the counts of the Chía detectors when they are available."]},
         {"title": "Monitoring, incident reporting and user feedback",
-         "bullets": ["Every prediction is logged (time, input, output, model version, latency) in logs/predictions.jsonl.",
-                     "Errors are logged in logs/errors.jsonl; feedback and incidents in logs/feedback.jsonl.",
-                     "Incidents are reviewed within one working day by the model owner; if the model is wrong for an intersection, "
-                     "the dashboard can fall back to the historical average while it is retrained.",
-                     "GET /v1/monitoring summarizes counts, errors, latency and the latest records."]},
+         "bullets": ["Every forecast is stored in the database (user, date, input, output, model version, latency) and also written to logs/predictions.jsonl.",
+                     "Errors, rejected inputs, failed logins and slow requests are stored in the app_logs table; errors also go to logs/errors.jsonl.",
+                     "Real outcomes recorded by operators are compared with the forecast: the Monitoring page shows the live MAE, the share of requests far from the training data and the latency, with alert thresholds.",
+                     "Incidents and feedback are managed in the Incidents module (open, in review, closed) and reviewed within one working day by an administrator.",
+                     "GET /v1/monitoring (administrators) summarizes the same checks as JSON."]},
     ]}
 
 

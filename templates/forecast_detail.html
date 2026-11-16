@@ -1,0 +1,48 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}Forecast {{ f.id }}{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf, plan_badge with context %}
+<a class="small" href="/forecasts">← Forecast history</a>
+<h1 class="h4 mt-2 mb-3">Forecast #{{ f.id }} · {{ f.inter_name }}</h1>
+<div class="row g-3 mb-3">
+  <div class="col-md-4"><div class="mini-card"><div class="small text-secondary">Target hour</div><div class="h5">{{ f.target_datetime }}</div>
+    <div class="small text-secondary mt-2">Expected vehicles per hour</div><div class="display-6">{{ f.predicted_vehicles }}</div>
+    <div class="small mt-2">Moment type: <b>{{ f.group_label }}</b></div></div></div>
+  <div class="col-md-8"><div class="mini-card"><h3>Forecast for the whole day</h3>
+    <div class="d-flex align-items-end gap-1" style="height:120px" aria-label="Hourly forecast">
+      {% for v in curve %}<div title="{{ loop.index0 }}:00 → {{ v }} veh/h" style="flex:1;height:{{ [4, (100 * v / peak)|round]|max }}%;background:{{ 'var(--stop)' if loop.index0 == hour else '#9aa5a0' }};border-radius:2px 2px 0 0"></div>{% endfor %}
+    </div>
+    <div class="d-flex justify-content-between small text-secondary"><span>0:00</span><span>12:00</span><span>23:00</span></div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-6"><div class="mini-card"><h3>Traceability</h3>
+    <table class="table table-sm small mb-0">
+      <tr><td>Requested by</td><td>{{ f.author }} ({{ f.source }})</td></tr><tr><td>Date and time</td><td>{{ f.created_at }}</td></tr>
+      <tr><td>Model</td><td>{{ f.model_name }}</td></tr><tr><td>Model version</td><td>{{ f.model_version }}</td></tr>
+      <tr><td>Response time</td><td>{{ f.latency_ms }} ms</td></tr></table>
+    {% for n in notes %}<div class="alert alert-warning py-2 small mt-3 mb-0">{{ n }}</div>{% endfor %}
+    <p class="small text-secondary mt-3 mb-0"><b>How to read it:</b> average vehicles expected in that hour. It is useful to plan the green time, but it is an estimate{% if test_mae %} with an average error of about {{ test_mae }} veh/h on the independent test{% endif %}.</p></div></div>
+  <div class="col-lg-6">
+    <div class="mini-card mb-3"><h3>Decision</h3>
+      <p class="small">Suggested green time from this forecast: <b>{{ suggestion }} s</b>.</p>
+      {% if plan %}<p class="small mb-0">Plan <a href="/plans/{{ plan.id }}">#{{ plan.id }}</a> {{ plan_badge(plan.status) }}</p>
+      {% else %}<a class="btn btn-dark btn-sm" href="/plans/new?inference_id={{ f.id }}">Create timing plan</a>{% endif %}
+    </div>
+    <div class="mini-card"><h3>Real outcome</h3>
+      {% if f.observed_vehicles is not none %}
+      <p class="small mb-0">Observed: <b>{{ f.observed_vehicles }}</b> veh/h · absolute error <b>{{ f.abs_error }}</b> (recorded {{ f.observed_at }}).</p>
+      {% else %}<p class="small text-secondary">Not recorded yet. When the real count is known, save it to compare it with the forecast.</p>{% endif %}
+      <form method="post" action="/forecasts/{{ f.id }}/outcome" class="d-flex gap-2 flex-wrap">
+        {{ csrf() }}
+        <input class="form-control form-control-sm" style="max-width:150px" name="observed" type="number" step="0.1" min="0" placeholder="Observed veh/h">
+        <button class="btn btn-outline-dark btn-sm" type="submit">Save</button>
+      </form>
+      {% if dataset_value is not none %}
+      <form method="post" action="/forecasts/{{ f.id }}/outcome" class="mt-2">{{ csrf() }}<input type="hidden" name="use_dataset" value="1">
+        <button class="btn btn-link btn-sm p-0" type="submit">Use the value in the historical counts ({{ dataset_value|round(1) }})</button></form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

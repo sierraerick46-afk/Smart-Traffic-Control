@@ -1,0 +1,21 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}New timing plan{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf, field, textarea with context %}
+<a class="small" href="/forecasts/{{ f.id }}">← Forecast #{{ f.id }}</a>
+<h1 class="h4 mt-2 mb-3">New timing plan · {{ f.inter_name }}</h1>
+<div class="row g-4">
+  <div class="col-lg-5"><div class="mini-card"><h3>Forecast used</h3>
+    <p class="small mb-1">{{ f.target_datetime }} · <b>{{ f.predicted_vehicles }}</b> veh/h ({{ f.group_label }})</p>
+    <p class="small mb-0">Model {{ f.model_version }}. Proposed green time: <b>{{ suggestion }} s</b>.</p></div></div>
+  <div class="col-lg-7">
+    <form method="post" class="mini-card" novalidate>
+      {{ csrf() }}<input type="hidden" name="inference_id" value="{{ f.id }}">
+      {{ field('final_green_s', 'Green time (seconds)', values, errors, type='number', help='Between ' ~ limits[0] ~ ' and ' ~ limits[1] ~ ' s. Moving the proposal by more than 15 s requires a justification.', attrs='min="%d" max="%d" required'|format(limits[0], limits[1])) }}
+      {{ textarea('rationale', 'Justification', values, errors, 3) }}
+      <button class="btn btn-dark btn-sm" type="submit">Save draft</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

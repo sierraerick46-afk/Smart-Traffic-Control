@@ -1,0 +1,48 @@
+{% extends "app_base.html" %}
+{% set active = 'ops' %}
+{% block title %}New forecast{% endblock %}
+{% block content %}
+{% from "_macros.html" import csrf with context %}
+<h1 class="h4 mb-1">New forecast</h1>
+<p class="small text-secondary">The model runs on the server. The result is saved in your history with your user, the date and the model version.</p>
+<div class="row g-4">
+  <div class="col-lg-6">
+    <form method="post" class="mini-card" novalidate>
+      {{ csrf() }}
+      <div class="mb-3">
+        <label class="form-label small" for="intersection_id">Intersection</label>
+        <select class="form-select form-select-sm{% if errors.get('intersection_id') %} is-invalid{% endif %}" id="intersection_id" name="intersection_id" required>
+          <option value="">Choose…</option>
+          {% for i in inters %}<option value="{{ i.id }}" {% if values.get('intersection_id')|string == i.id|string %}selected{% endif %}>{{ i.code }} · {{ i.name }}</option>{% endfor %}
+        </select>
+        {% if errors.get('intersection_id') %}<div class="invalid-feedback">{{ errors['intersection_id'] }}</div>{% endif %}
+      </div>
+      <div class="row g-3">
+        <div class="col-7">
+          <label class="form-label small" for="date">Date</label>
+          <input class="form-control form-control-sm{% if errors.get('date') %} is-invalid{% endif %}" id="date" name="date" type="date" value="{{ values.get('date') or '2017-06-12' }}" min="2015-01-01" max="2030-12-31" required>
+          {% if errors.get('date') %}<div class="invalid-feedback">{{ errors['date'] }}</div>{% endif %}
+        </div>
+        <div class="col-5">
+          <label class="form-label small" for="hour">Hour (0-23)</label>
+          <input class="form-control form-control-sm" id="hour" name="hour" type="number" min="0" max="23" value="{{ values.get('hour') or 8 }}" required>
+        </div>
+      </div>
+      {% if errors.get('model') %}<div class="alert alert-danger py-2 small mt-3 mb-0">{{ errors['model'] }}</div>{% endif %}
+      <button class="btn btn-dark btn-sm mt-3" type="submit">Run forecast</button>
+    </form>
+  </div>
+  <div class="col-lg-6">
+    <div class="mini-card">
+      <h3>Model in use</h3>
+      <table class="table table-sm small mb-2">
+        <tr><td>Model</td><td>{{ model.name }}</td></tr>
+        <tr><td>Version</td><td>{{ model.version }}</td></tr>
+        <tr><td>Trained on</td><td>{{ model.trained_on }}</td></tr>
+        <tr><td>Independent test</td><td>R² {{ model.test.get('r2', '-') }} · MAE {{ model.test.get('mae', '-') }} veh/h</td></tr>
+      </table>
+      <p class="small text-secondary mb-0"><b>Limits:</b> the counts come from a public dataset assigned to these intersections, not from field measurements. Trees do not extrapolate the trend: dates far after April 2017 are likely underestimated. The forecast supports a decision; it does not replace the judgement of the operator.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
