@@ -1,5 +1,6 @@
-from flask import Blueprint, abort, render_template
+from flask import Blueprint, abort, current_app, render_template
 
+from controllers import site_links
 from controllers.auth_controller import login_required
 from controllers.crisp_content import PHASES, REFERENCES, build_phase, get_phase, load
 
@@ -38,6 +39,10 @@ def create_web_blueprint(services):
 
     @bp.route("/")
     def home():
-        return render_template("home.html")
+        return render_template("home.html", links=site_links.links(current_app.static_folder))
+
+    @bp.route("/user-guide")
+    def user_guide():
+        return render_template("user_guide.html", active="guide", links=site_links.links(current_app.static_folder))
 
     return bp

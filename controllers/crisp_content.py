@@ -25,7 +25,7 @@ REFERENCES = [
     "KDnuggets. (2025). <em>The machine learning lifecycle</em>.",
     "ML-Ops.org. (n.d.). <em>CRISP-ML(Q): The ML lifecycle process</em>.",
     "Pedregosa, F., et al. (2011). Scikit-learn: Machine learning in Python. <em>Journal of Machine Learning Research, 12</em>, 2825–2830.",
-    "Schmid, S., Wurst, M., &amp; Wirth, R. (2020). <em>Towards CRISP-ML(Q): A machine learning process model with quality assurance methodology</em>.",
+    "Studer, S., Bui, T. B., Drescher, C., Hanuschkin, A., Winkler, L., Peters, S., &amp; Müller, K.-R. (2021). Towards CRISP-ML(Q): A machine learning process model with quality assurance methodology. <em>Machine Learning and Knowledge Extraction, 3</em>(2), 392–413.",
 ]
 
 LABELS = {"seasonal_mean": "Seasonal mean (baseline)", "ridge": "Ridge regression", "random_forest": "Random Forest",
