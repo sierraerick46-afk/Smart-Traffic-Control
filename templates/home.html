@@ -39,6 +39,7 @@
 </header>
 
 <main class="container py-5" id="project">
+
   <section class="mb-5" aria-labelledby="res-title">
     <h2 id="res-title" class="section-title h3 mb-1">Project resources</h2>
     <p class="text-secondary">Everything delivered in the three activities, in one place. The operational modules and the business data need an account.</p>
@@ -53,110 +54,142 @@
         <b>Intelligent system</b><span>Forecasts, timing plans, incidents, intersections and reports. Requires login (administrator, operator or viewer).</span></a></div>
       <div class="col-sm-6 col-lg-4"><a class="res-card" href="/user-guide">
         <b>User documentation</b><span>User manual by role, training guide and the incident and feedback procedure.</span></a></div>
-      <div class="col-sm-6 col-lg-4"><a class="res-card" href="#video">
-        <b>Presentation video</b><span>20-minute presentation in English by the four team members.</span></a></div>
     </div>
   </section>
 
-  <section class="mb-5" id="video" aria-labelledby="video-title">
-    <h2 id="video-title" class="section-title h3 mb-3">Presentation video</h2>
-    {% if links.video_embed %}
-    <div class="ratio ratio-16x9 video-frame"><iframe src="{{ links.video_embed }}" title="Project presentation video" allowfullscreen></iframe></div>
-    <p class="small mt-2 mb-0"><a href="{{ links.video_url }}" target="_blank" rel="noopener">Open the video in a new tab</a></p>
-    {% elif links.video_url %}
-    <p><a class="btn btn-dark" href="{{ links.video_url }}" target="_blank" rel="noopener">Watch the presentation video</a></p>
-    {% else %}
-    <p class="text-secondary mb-0">The video link will be published here.</p>
-    {% endif %}
-  </section>
-
-  <div class="mb-4">
-    <h2 class="section-title h3 mb-1">The project</h2>
-    <p class="text-secondary mb-0">Select a section to expand it.</p>
+  <div class="mb-4" id="pgc">
+    <h2 class="section-title h3 mb-1">PGC documentation</h2>
+    <p class="text-secondary mb-0">The project as it was finally built. Select a section to expand it.</p>
   </div>
 
   <div class="accordion topics" id="topics">
 
-    <!-- 1 · Problem and justification -->
     <div class="accordion-item">
       <h3 class="accordion-header">
         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#t1" aria-expanded="true" aria-controls="t1">
-          <span class="topic-num">1</span>Problem statement and justification
+          <span class="topic-num">1</span>Project title
         </button>
       </h3>
       <div id="t1" class="accordion-collapse collapse show" data-bs-parent="#topics">
         <div class="accordion-body">
-          <h4 class="h6">Problem statement</h4>
-          <p>In Chía the traffic lights usually repeat the same cycle all day, even when one street is empty and the other is full. But traffic is not always the same: it changes with the hour, the day of the week and the type of moment (off-peak, moderate or peak). On Avenida Pradilla, for example, about 40,000 vehicles pass every day and a trip that normally takes 7–10 minutes can take up to 40 in rush hour (El Cronista, 2026). When the green time does not match the traffic, cars wait more than necessary, green time is wasted on empty streets, and drivers lose time and fuel.</p>
-          <div class="callout mb-4"><b>Guiding question:</b> how can the traffic lights of four intersections in Chía adapt their green time to the traffic each one receives, without testing unproven ideas on real streets?</div>
-          <h4 class="h6">Justification</h4>
-          <ul>
-            <li><b>We have data to work with.</b> Hourly vehicle counts for four junctions and a traffic-signal inventory can show patterns that a fixed plan ignores.</li>
-            <li><b>Each intersection is analyzed on its own.</b> Every intersection has its own rush hours and its own queues, so one average for the whole town would hide them. The dashboard and the simulation show the results of each one separately.</li>
-            <li><b>Each part of the problem has a matching AI technique.</b> Unsupervised learning finds the type of moment, supervised learning forecasts the traffic, and reinforcement learning decides the green time.</li>
-            <li><b>It is safe.</b> The agent learns in a simulator and is compared with a fixed plan before anything is proposed for the street.</li>
-            <li><b>It is easy to extend.</b> The app is split in layers (Controller, Service, Model), so each part can be tested and improved separately.</li>
+          <div class="callout mb-3"><b>Smart Traffic Light Control with Artificial Intelligence</b></div>
+          <p class="mb-2">The title names the problem (traffic lights that do not adapt to demand), the proposed solution (artificial intelligence) and the scope that was implemented:</p>
+          <ul class="mb-0">
+            <li><b>Problem:</b> fixed-time signals at four intersections of Chía, Cundinamarca.</li>
+            <li><b>Solution:</b> a model that forecasts the vehicles per hour of each intersection, a rule that turns the forecast into a proposed green time, and a reinforcement learning agent tested in simulation.</li>
+            <li><b>Implemented scope:</b> a web information system with roles where the forecast becomes a timing plan that a person approves, and a simulator. It is a prototype: it does not control real traffic lights and the counts come from a public dataset assigned to Chía.</li>
           </ul>
-          <p class="text-secondary small mb-0">Scope: this is a simulation prototype and it does not control real traffic lights. The vehicle counts come from a public dataset that we assigned to four intersections of Chía as a case study, so the results show how the method works, not the real traffic of Chía.</p>
         </div>
       </div>
     </div>
 
-    <!-- 2 · Objectives -->
     <div class="accordion-item">
       <h3 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t2" aria-expanded="false" aria-controls="t2">
-          <span class="topic-num">2</span>Project objectives
+          <span class="topic-num">2</span>Problem statement and justification
         </button>
       </h3>
       <div id="t2" class="accordion-collapse collapse" data-bs-parent="#topics">
         <div class="accordion-body">
-          <h4 class="h6">General objective</h4>
-          <div class="callout mb-4">Build a web prototype that uses artificial intelligence to adjust the green time of four intersections in Chía according to the traffic each one receives, and check in a simulation whether it works better than a fixed 30-second plan.</div>
-          <h4 class="h6">Specific objectives</h4>
-          <ol class="obj-list">
-            <li>Clean and organize the hourly vehicle counts and the data of the four intersections, so each one can be analyzed on its own.</li>
-            <li>Find the types of moment (off-peak, moderate and peak) of each intersection with the K-Means algorithm.</li>
-            <li>Forecast the vehicles per hour with five models (baseline, Ridge, Random Forest, Gradient Boosting and an MLP) and compare them with MSE, MAE and R² using time-series cross-validation and an independent test set.</li>
-            <li>Train a DQN agent in a simulated intersection (four approaches and two phases) that decides when to keep or change the green, and test it on each of the four intersections.</li>
-            <li>Compare the agent with the 30-second fixed plan (average queue, vehicles served and vehicles lost) and publish the application on Render with a dashboard and a live simulation.</li>
-          </ol>
+          <h4 class="h6">Problem and context</h4>
+          <p>In Chía the traffic lights usually repeat the same cycle all day, even when one street is empty and the other is full. Traffic is not constant: it changes with the hour, the day of the week and the type of moment (off-peak, moderate or peak). When the green time does not match the traffic, vehicles wait more than necessary and green time is wasted on empty approaches.</p>
+          <h4 class="h6">Affected population</h4>
+          <p>Drivers, bus and taxi passengers, cyclists and pedestrians who cross the town, the residents of the neighbourhoods around the main corridors, and the municipal mobility office, which has to plan the signal timings with little information.</p>
+          <h4 class="h6">Supporting evidence</h4>
+          <ul>
+            <li>About 40,000 vehicles use Avenida Pradilla every day, and in rush hour a trip of 7–10 minutes can take up to 40 minutes (El Cronista, 2026).</li>
+            <li>Between 2022 and 2024 the trip out of Chía along Avenida Pradilla went from 6 to 10 minutes and the trip in from 8 to 14 minutes (Alcaldía Municipal de Chía, 2024).</li>
+            <li>Around half of the vehicles that enter Chía are not from residents (Infobae, 2025), and the town has already restricted heavy cargo (Alcaldía Municipal de Chía, 2025).</li>
+            <li>In our data the busiest intersection carries on average 45 vehicles per hour and 89 at the 95th percentile, while another carries 7 and 13: one fixed plan cannot fit both.</li>
+          </ul>
+          <h4 class="h6">Consequences</h4>
+          <p>Longer queues and waiting times, more fuel and emissions from idling vehicles, delays for public transport, and signal plans that are changed without data.</p>
+          <div class="callout mb-3"><b>Guiding question:</b> how can the traffic lights of four intersections in Chía adapt their green time to the traffic each one receives, without testing unproven ideas on real streets?</div>
+          <h4 class="h6">Justification and contribution of the intelligent system</h4>
+          <ul class="mb-2">
+            <li><b>It uses data instead of a fixed plan.</b> Hourly vehicle counts show patterns by intersection, hour and day that a fixed plan ignores.</li>
+            <li><b>It forecasts the demand.</b> The selected model forecasts the vehicles per hour with {% if rep %}R² {{ rep.final.test.r2 }} and an average error of {{ rep.final.test.mae }}{% else %}R² 0.904 and an average error of 5.6{% endif %} vehicles per hour on two months it never saw.</li>
+            <li><b>It supports a decision, it does not replace it.</b> The forecast becomes a proposed green time; an operator adjusts it and an administrator approves or rejects it, and every step is recorded.</li>
+            <li><b>It learns from reality.</b> The real count is recorded after the hour, the error is compared with the test error and an alert indicates when to retrain.</li>
+            <li><b>It is safe to try.</b> The reinforcement learning agent is evaluated in a simulator against a fixed 30-second plan{% if ctl %}: it reduced the average queue by {{ ctl.improvement_mean }}% on average over five trainings{% endif %}.</li>
+          </ul>
+          <p class="text-secondary small mb-0">Scope: a prototype that does not control real traffic lights. The counts come from a public hourly dataset assigned to four intersections of Chía as a case study, so the results show how the method works, not the real traffic of Chía.</p>
         </div>
       </div>
     </div>
 
-    <!-- 3 · Referential framework -->
     <div class="accordion-item">
       <h3 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t3" aria-expanded="false" aria-controls="t3">
-          <span class="topic-num">3</span>Referential framework
+          <span class="topic-num">3</span>General objective
         </button>
       </h3>
       <div id="t3" class="accordion-collapse collapse" data-bs-parent="#topics">
         <div class="accordion-body">
+          <div class="callout">Develop and publish a web information system that uses machine learning to forecast the hourly traffic of four intersections of Chía and to support the decision of their green time, validating the forecasting model on independent data and the adaptive control in simulation, so that signal timings can be planned with data instead of a fixed plan.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t4" aria-expanded="false" aria-controls="t4">
+          <span class="topic-num">4</span>Specific objectives
+        </button>
+      </h3>
+      <div id="t4" class="accordion-collapse collapse" data-bs-parent="#topics">
+        <div class="accordion-body">
+          <div class="table-responsive">
+            <table class="table table-sm align-top">
+              <thead><tr><th>#</th><th>Objective</th><th>Verification criterion</th><th>Result</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><b>Data preparation.</b> Clean the hourly counts of the four intersections, build the features and split the data in time order, fitting every preprocessing step on training data only.</td><td>No invalid, negative or duplicated rows; train, validation and test partitions without overlap.</td><td>Met. 48,120 records; train Nov 2015–Feb 2017, validation Mar–Apr 2017, test May–Jun 2017 (<a href="/crisp-ml/2">phase 2</a>).</td></tr>
+                <tr><td>2</td><td><b>Model development and evaluation.</b> Train and tune five forecasting models with time-series cross-validation and select one by validation error.</td><td>R² ≥ 0.80 on the independent test set and lower error than a seasonal baseline.</td><td>Met. {% if rep %}{{ rep.final.label }}: R² {{ rep.final.test.r2 }}, MAE {{ rep.final.test.mae }} veh/h against MAE {{ rep.final.test_baseline_seasonal_mean.mae }} of the baseline{% else %}Gradient Boosting: R² 0.904{% endif %} (<a href="/crisp-ml/4">phase 4</a>).</td></tr>
+                <tr><td>3</td><td><b>Decision model.</b> Train a DQN agent in a simulated intersection and compare it with a fixed 30-second plan.</td><td>Lower average queue than the fixed plan in most trainings.</td><td>Met in simulation. {% if ctl %}{{ ctl.improvement_mean }}% less queue on average over five trainings (from {{ ctl.improvement_min }}% to {{ ctl.improvement_max }}%){% endif %}; better in four of five.</td></tr>
+                <tr><td>4</td><td><b>System implementation.</b> Build a web information system with registration, roles, a persistent database and the forecast-to-plan process, with the model integrated on the server.</td><td>Three roles enforced on the server; every inference stored with user, date, result and model version; automated tests pass.</td><td>Met. Administrator, operator and viewer; PostgreSQL; 43 automated tests passed.</td></tr>
+                <tr><td>5</td><td><b>Validation of the solution.</b> Publish the system and verify authentication, roles, persistence, inference and monitoring in the deployed environment.</td><td>Complete workflow executed on the published site; monitoring alert demonstrated.</td><td>Met. Operational review on 15 Nov 2026 with the three roles; retraining alert raised in the labelled simulated test (<a href="/crisp-ml/6">phase 6</a>).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t5" aria-expanded="false" aria-controls="t5">
+          <span class="topic-num">5</span>Reference framework
+        </button>
+      </h3>
+      <div id="t5" class="accordion-collapse collapse" data-bs-parent="#topics">
+        <div class="accordion-body">
           <div class="row g-3">
-            <div class="col-md-6"><div class="mini-card">
-              <h3>Theoretical</h3>
-              <p class="small mb-2"><b>Unsupervised learning.</b> K-Means puts similar hours in the same group without anyone telling it the groups first (MacQueen, 1967).</p>
-              <p class="small mb-2"><b>Supervised learning.</b> Random Forest and Gradient Boosting build many small decision trees and combine them (Breiman, 2001; Friedman, 2001). The MLP is a neural network that learns by correcting its own errors (Rumelhart et al., 1986).</p>
-              <p class="small mb-0"><b>Reinforcement learning.</b> An agent learns by trial and error to get the best reward (Sutton &amp; Barto, 2018). A DQN uses a neural network to decide which action is best (Mnih et al., 2015).</p>
+            <div class="col-12"><div class="mini-card">
+              <h3>Background and related projects</h3>
+              <p class="small mb-2"><b>Fixed-time control.</b> Webster (1958) proposed computing the cycle and the green times from the flows of each approach; the plan is then repeated until someone changes it. Our 30-second fixed plan is the reference against which the agent is compared.</p>
+              <p class="small mb-2"><b>Adaptive systems in operation.</b> SCOOT (Hunt et al., 1982) and SCATS (Sims &amp; Dobinson, 1980) adjust the timings from detectors in the road. They show that adapting the green to demand is useful, but they need detectors and a control centre that Chía does not have; our project uses the hourly counts that are available and a human approval step.</p>
+              <p class="small mb-2"><b>Traffic flow forecasting.</b> Forecasting the flow from its history is a long-standing problem; Lv et al. (2015) showed that learning models improve on classical methods, and Hyndman and Athanasopoulos (2021) explain why the validation must respect time order. We followed both ideas.</p>
+              <p class="small mb-0"><b>Reinforcement learning for signals.</b> Genders and Razavi (2016) and IntelliLight (Wei et al., 2018) trained deep reinforcement learning agents that reduced queues in simulation; the survey of Wei et al. (2019) summarizes this line. Our DQN follows the same approach, also in simulation first.</p>
             </div></div>
             <div class="col-md-6"><div class="mini-card">
-              <h3>Conceptual</h3>
-              <p class="small mb-2"><b>Phase:</b> set of approaches that receive green at the same time. <b>Cycle:</b> sequence of all phases. <b>Green time:</b> seconds a phase keeps the right of way.</p>
-              <p class="small mb-2"><b>Queue:</b> vehicles waiting at an approach. <b>Waiting time:</b> time those vehicles spend stopped. <b>Flow:</b> vehicles that pass in one hour.</p>
-              <p class="small mb-2"><b>Fixed-time control</b> repeats a pre-set plan (Webster, 1958); <b>adaptive control</b> adjusts it to the observed traffic (Wei et al., 2019).</p>
-              <p class="small mb-0"><b>CRISP-ML(Q)</b> is a step-by-step method for machine learning projects, from understanding the problem to monitoring the model (Studer et al., 2021). Each of its six phases has its own page in the <a href="/crisp-ml">CRISP-ML menu</a>.</p>
+              <h3>Theoretical foundations</h3>
+              <p class="small mb-2"><b>Unsupervised learning.</b> K-Means puts similar hours in the same group without labels (MacQueen, 1967); we use it to label each hour of the week as off-peak, moderate or peak.</p>
+              <p class="small mb-2"><b>Supervised learning.</b> Random Forest and Gradient Boosting combine many decision trees (Breiman, 2001; Friedman, 2001); the MLP is a neural network trained with backpropagation (Rumelhart et al., 1986). Gradient Boosting was selected.</p>
+              <p class="small mb-0"><b>Reinforcement learning.</b> An agent learns by trial and error to maximize a reward (Sutton &amp; Barto, 2018); a DQN estimates the value of each action with a neural network (Mnih et al., 2015).</p>
+            </div></div>
+            <div class="col-md-6"><div class="mini-card">
+              <h3>Technical concepts</h3>
+              <p class="small mb-2"><b>Phase, cycle and green time:</b> the approaches that move together, the sequence of phases, and the seconds a phase keeps the right of way. <b>Queue</b> and <b>flow</b> (vehicles per hour) are the quantities we forecast and reduce.</p>
+              <p class="small mb-2"><b>CRISP-ML(Q)</b> organizes a machine learning project in six phases with quality checks, from business understanding to monitoring (Studer et al., 2021). We applied all six (<a href="/crisp-ml">CRISP-ML pages</a>).</p>
+              <p class="small mb-0"><b>Information system security.</b> Role-based access control assigns permissions to roles instead of to people (Sandhu et al., 1996); passwords are stored as salted scrypt hashes (Percival &amp; Josefsson, 2016) and forms are protected against cross-site request forgery (OWASP Foundation, n.d.-a, n.d.-b).</p>
             </div></div>
             <div class="col-md-6"><div class="mini-card">
               <h3>Technological</h3>
-              <p class="small mb-0">Python backend with Flask and gunicorn; pandas and NumPy for the data; scikit-learn for K-Means, Random Forest and Gradient Boosting (Pedregosa et al., 2011); PyTorch for the MLP and the DQN (Paszke et al., 2019); HTML, CSS, JavaScript and Bootstrap 5 for the interface; a login to protect the dashboard and the simulation; Git and GitHub for teamwork (one branch per phase) and Render for deployment.</p>
+              <p class="small mb-0">Python with Flask (Pallets, n.d.) and gunicorn; pandas and NumPy; scikit-learn for K-Means and the regressors (Pedregosa et al., 2011); PyTorch for the MLP and the DQN (Paszke et al., 2019); PostgreSQL in production and SQLite in development; HTML, JavaScript and Bootstrap 5; Git and GitHub with one branch per phase and pull requests; Render for deployment (Render, n.d.).</p>
             </div></div>
             <div class="col-md-6"><div class="mini-card">
               <h3>Contextual</h3>
-              <p class="small mb-2">Chía is a municipality of the Sabana Centro region, about 10 km north of Bogotá, and its roads fill up at commuting hours. Between 2022 and 2024 the trip out of Chía along Avenida Pradilla went from 6 to 10 minutes and the trip in from 8 to 14 minutes (Alcaldía Municipal de Chía, 2024). About 40,000 vehicles use this avenue every day, and in rush hour a trip of 7–10 minutes can take up to 40 (El Cronista, 2026).</p>
-              <p class="small mb-2">The Mobility Secretariat estimates that around half of the vehicles entering Chía are not from residents (Infobae, 2025), and the town already tried measures such as the environmental "pico y placa" for heavy cargo (Alcaldía Municipal de Chía, 2025). Our project looks at the other side: the traffic lights.</p>
-              <p class="small mb-0">We work with a list of four intersections (ID, address, number of phases) and hourly vehicle counts for four junctions. The simulator models one intersection with four approaches and two phases.</p>
+              <p class="small mb-0">Chía is a municipality of the Sabana Centro region, about 10 km north of Bogotá, and its main corridors fill up at commuting hours (Alcaldía Municipal de Chía, 2024; El Cronista, 2026). We chose four intersections of the town and worked with an hourly count dataset (fedesoriano, 2021) and a traffic-signal inventory (Secretaría Distrital de Movilidad de Bogotá, n.d.) as the model of how a signal list is organized.</p>
             </div></div>
             <div class="col-12"><div class="mini-card">
               <h3>The four intersections</h3>
@@ -174,101 +207,74 @@
                   </tbody>
                 </table>
               </div>
-              <p class="small text-secondary mb-0"><b>*Speed limit:</b> national urban maximum of 50 km/h for most vehicles (30 km/h in school and residential zones) under Ley 2251 de 2022; the signed limit at each point was not verified on site. <b>P95 veh/h:</b> hourly vehicles that were exceeded only 5% of the time (a more realistic peak than the absolute maximum). <b>About the data:</b> the counts come from a public hourly traffic dataset (traffic.csv, from 1 November 2015 to 30 June 2017) that we assigned to these four intersections. They are not measurements taken in Chía. The signal inventory (Secretaría Distrital de Movilidad de Bogotá) was used as a model of how a signal list is organized.</p>
+              <p class="small text-secondary mb-0"><b>*Speed limit:</b> national urban maximum of 50 km/h for most vehicles (30 km/h in school and residential zones) under Ley 2251 de 2022; the signed limit at each point was not verified on site. <b>P95 veh/h:</b> hourly vehicles that were exceeded only 5% of the time (a more realistic peak than the absolute maximum). <b>About the data:</b> the counts come from a public hourly traffic dataset (traffic.csv, from 1 November 2015 to 30 June 2017; fedesoriano, 2021) that we assigned to these four intersections. They are not measurements taken in Chía. The signal inventory (Secretaría Distrital de Movilidad de Bogotá) was used as a model of how a signal list is organized.</p>
             </div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 4 · Methodology -->
     <div class="accordion-item">
       <h3 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t4" aria-expanded="false" aria-controls="t4">
-          <span class="topic-num">4</span>Methodology
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t6" aria-expanded="false" aria-controls="t6">
+          <span class="topic-num">6</span>Methodology and development schedule
         </button>
       </h3>
-      <div id="t4" class="accordion-collapse collapse" data-bs-parent="#topics">
+      <div id="t6" class="accordion-collapse collapse" data-bs-parent="#topics">
         <div class="accordion-body">
-          <h4 class="h6">Layered architecture</h4>
-          <div class="arch mb-4">
-            <div class="arch-box"><b>View</b><span>HTML5 · Fetch API · Bootstrap</span></div><span class="arch-arrow">→</span>
-            <div class="arch-box"><b>Controllers</b><span>Flask routes, REST API and login</span></div><span class="arch-arrow">→</span>
-            <div class="arch-box"><b>Services</b><span>Clustering · Prediction · Control</span></div><span class="arch-arrow">→</span>
-            <div class="arch-box"><b>Models</b><span>Data loader · MLP · DQN · Environment</span></div>
-          </div>
-          <h4 class="h6">Our four phases and CRISP-ML(Q)</h4>
+          <h4 class="h6">How the six CRISP-ML phases were applied</h4>
           <p class="small text-secondary">CRISP-ML(Q) is a method for machine learning projects with six phases, from understanding the problem to monitoring the model (Studer et al., 2021; ML-Ops.org, n.d.). We organized our work in four phases and each one covers some of those CRISP-ML(Q) phases. The phases are iterative: if we find a problem in one, we can go back to an earlier one. All the detail of each CRISP-ML(Q) phase is in its own page:
             <a href="/crisp-ml/1">1</a> · <a href="/crisp-ml/2">2</a> · <a href="/crisp-ml/3">3</a> · <a href="/crisp-ml/4">4</a> · <a href="/crisp-ml/5">5</a> · <a href="/crisp-ml/6">6</a>.</p>
           <ol class="obj-list">
             <li><b>Phase 1 · Group.</b> <em>CRISP-ML(Q): <a href="/crisp-ml/1">business and data understanding</a> and <a href="/crisp-ml/2">data engineering</a>.</em> The goal is to reduce the queues of four intersections by adapting the green time. We checked the data: traffic.csv has 48,120 hourly records of four junctions (November 2015 to June 2017), with no empty values, no negative counts and no duplicates, and junction 4 has only 4,344 records against 14,592 of the others. The main risk is that these counts were not measured in Chía, so the prototype works only in simulation. The data loader runs the same steps every time: it fixes the dates, removes invalid or repeated rows, and creates the hour, the day of the week, the weekend flag and a sine-cosine version of the hour, so that 23:00 and 00:00 are close. Then K-Means (k = 3) groups the 168 day-hour slots of the week into off-peak, moderate and peak, for all the intersections together and for each one. The silhouette index is 0.60 in total and between 0.53 and 0.65 per intersection.</li>
             <li><b>Phase 2 · Predict.</b> <em>CRISP-ML(Q): <a href="/crisp-ml/3">model engineering</a> and <a href="/crisp-ml/4">model evaluation</a>.</em> Five models (a seasonal-mean baseline, Ridge regression, Random Forest, Gradient Boosting and an MLP in PyTorch) were trained on time-ordered partitions: training from November 2015 to February 2017 (36,408 rows), validation in March and April 2017 (5,856 rows) and an independent test in May and June 2017 (5,856 rows). Each model was tuned with 5-fold time-series cross-validation, and every preprocessing step (K-Means groups, outlier caps, scaling) was fitted on training data only. Gradient Boosting had the lowest validation error and, refitted on training plus validation, reached an R² of 0.904 and an average error of 5.6 vehicles per hour on the test set, above the 0.8 required by the course professor and 53% less error than the seasonal baseline. A first version without the intersection and the date only reached an R² of 0.11 (<a href="/crisp-ml/4">details</a>).</li>
             <li><b>Phase 3 · Decide.</b> <em>CRISP-ML(Q): <a href="/crisp-ml/3">model engineering</a> and <a href="/crisp-ml/4">model evaluation</a>.</em> We built a simulator of one intersection (four approaches and two phases; minimum green 8 s, maximum 60 s, yellow 3 s, queue limit 40) and trained a DQN agent in it during 60 episodes of 200 simulated seconds on the four intersections. The reward penalizes long queues and unnecessary changes. To evaluate it we compared it with the 30-second fixed plan on new episodes: over five trainings the average queue went from 10.75 to 9.13 vehicles (15% less on average, from −15% to 33%), with 165.4 vehicles served against 163.7 and no vehicles lost. The agent was better in four of the five trainings, so every new agent is checked against the fixed plan before it is used. The results were reviewed with our course professor; a review with the mobility office of Chía is still pending.</li>
-            <li><b>Phase 4 · Home.</b> <em>CRISP-ML(Q): <a href="/crisp-ml/5">deployment</a> and <a href="/crisp-ml/6">monitoring and maintenance</a>.</em> The models are inside a Flask application with a JSON API, served with gunicorn and published on Render. The operational modules (forecasts, timing plans, incidents, intersections, reports, dashboard, simulation) and the API need an account: users register, log in and have a role (administrator, operator or viewer) that the server enforces, and passwords are saved as hashes. This Home and the CRISP-ML pages are public. The documentation is this page, the CRISP-ML pages and the README. The saved model (artifacts/model.joblib) can be tried by anyone in the <a href="/demo">Demo</a>, and every prediction is logged. For the monitoring, a 7-day MAE above 1.5 times the test MAE (about 8.5 vehicles per hour) triggers retraining, and a labelled test with simulated operational data shows the alert working (<a href="/crisp-ml/6">phase 6</a>). It is a prototype and does not control real traffic lights.</li>
+            <li><b>Phase 4 · Home and information system.</b> <em>CRISP-ML(Q): <a href="/crisp-ml/5">deployment</a> and <a href="/crisp-ml/6">monitoring and maintenance</a>.</em> The saved model (artifacts/model.joblib, featurizer and Gradient Boosting) is loaded by a Flask application served with gunicorn and published on Render with a PostgreSQL database. It is integrated in an information system: users register, log in and have a role (administrator, operator or viewer) enforced by the server; an operator requests a forecast, the server runs the model and stores it with the user and the model version, and the forecast becomes a timing plan that an administrator approves or rejects. The real count is recorded later and compared with the forecast. For the monitoring, a live MAE above 1.5 times the test MAE (about 8.5 vehicles per hour) triggers retraining, and a labelled test with simulated operational data shows the alert working (<a href="/crisp-ml/6">phase 6</a>). It is a prototype and does not control real traffic lights.</li>
           </ol>
+
+          <h4 class="h6 mt-4">Development and integration of the web information system</h4>
+          <p class="small">The system grew in three steps. First a Flask prototype with a dashboard and a simulator, built in layers (controllers, services, models). Then the complete CRISP-ML process, which produced the saved model (<code>artifacts/model.joblib</code>) with its preprocessing. Finally the information system: a relational database with seven tables (users, intersections, model versions, inferences, timing plans, incidents and logs), registration and login with three roles, and four business processes. The model is integrated on the server: the operator chooses an intersection, date and hour, the server builds the same features used in training, runs the model, stores the inference with the user and the model version, and proposes a green time that follows the plan workflow (draft → pending → approved → applied). Each team member worked on a branch and the changes reached the main branch through pull requests; every merge redeploys the application on Render.</p>
+          <div class="arch mb-4">
+            <div class="arch-box"><b>View</b><span>Jinja · Bootstrap · JavaScript</span></div><span class="arch-arrow">→</span>
+            <div class="arch-box"><b>Controllers</b><span>Auth · roles · CSRF · API</span></div><span class="arch-arrow">→</span>
+            <div class="arch-box"><b>Services</b><span>Forecasting · plans · incidents · reports</span></div><span class="arch-arrow">→</span>
+            <div class="arch-box"><b>Data and ML</b><span>PostgreSQL · model.joblib · DQN</span></div>
+          </div>
+
+          <h4 class="h6">Development schedule</h4>
+          <p class="small text-secondary">Planned weeks come from the eight-week plan of the proposal; actual dates come from the commits and pull requests of the repository.</p>
+          <div class="table-responsive">
+            <table class="table table-sm align-top schedule">
+              <thead><tr><th>#</th><th>Activity</th><th>Responsible</th><th>Planned</th><th>Actual</th><th>Deliverable</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Problem, proposal, data sources and app structure</td><td>All · Erick (repository)</td><td>Week 1</td><td>29 Oct 2026</td><td>Approved proposal; repository with datasets and Flask structure</td></tr>
+                <tr><td>2</td><td>Phase 1 · Group: data loader and K-Means</td><td>Erick</td><td>Weeks 1–2</td><td>29–30 Oct 2026</td><td>Data loader and clustering service</td></tr>
+                <tr><td>3</td><td>Phase 2 · Predict: first forecasting models</td><td>Edward</td><td>Weeks 2–4</td><td>30 Oct 2026</td><td>Prediction service and comparison card</td></tr>
+                <tr><td>4</td><td>Phase 3 · Decide: simulator and DQN agent</td><td>Santiago</td><td>Weeks 3–6</td><td>30 Oct and 13 Nov 2026</td><td>Traffic environment, control service and simulation page</td></tr>
+                <tr><td>5</td><td>Phase 4 · Home: documentation, intersections of Chía and login</td><td>Ivan · Santiago</td><td>Weeks 5–7</td><td>30 Oct and 13 Nov 2026</td><td>Public home page, CRISP-ML pages and login</td></tr>
+                <tr><td>6</td><td>Activity R3A2: complete CRISP-ML process (validation by time, five models, test R² ≥ 0.80, monitoring test)</td><td>Edward</td><td>Week 7</td><td>14 Nov 2026</td><td>train.py, monitor.py, model.joblib, CRISP-ML evidence and technical report</td></tr>
+                <tr><td>7</td><td>Deployment on Render</td><td>Santiago</td><td>Week 7</td><td>14 Nov 2026</td><td>Published URL</td></tr>
+                <tr><td>8</td><td>Activity R3A3: information system (database, roles, forecast-to-plan process, incidents, reports, monitoring, tests)</td><td>Ivan</td><td>Week 8</td><td>15 Nov 2026</td><td>Information system, automated tests, operational review and technical report</td></tr>
+                <tr><td>9</td><td>Activity R3A4: PGC documentation, resource links, user guide and final report</td><td>Edward</td><td>Week 8</td><td>16 Nov 2026</td><td>This homepage, user guide and final technical report</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small text-secondary mb-0">Deviation from the plan: the work was concentrated in two periods (29–30 October and 13–16 November) instead of being spread over eight weeks. The forecasting model was rebuilt on 14 November after the professor required R² ≥ 0.80, and the information system was added on 15 November when the course asked for business processes and roles.</p>
         </div>
       </div>
     </div>
 
-    <!-- 5 · Schedule -->
     <div class="accordion-item">
       <h3 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t5" aria-expanded="false" aria-controls="t5">
-          <span class="topic-num">5</span>Development schedule
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t7" aria-expanded="false" aria-controls="t7">
+          <span class="topic-num">7</span>Bibliographic references
         </button>
       </h3>
-      <div id="t5" class="accordion-collapse collapse" data-bs-parent="#topics">
-        <div class="accordion-body">
-          <p class="small text-secondary">Eight weeks. Later phases start once the earlier ones give their output (first the groups, then the forecast, then the agent).</p>
-          <div class="gantt-wrap">
-          <div class="gantt" role="table" aria-label="Development schedule by week">
-          <div></div>
-          <div class="wk">W1</div><div class="wk">W2</div><div class="wk">W3</div><div class="wk">W4</div>
-          <div class="wk">W5</div><div class="wk">W6</div><div class="wk">W7</div><div class="wk">W8</div>
-          <div class="lbl">Phase 1 · Group<span>Data understanding, data engineering, K-Means</span></div>
-          <div class="g-cell g-1"></div><div class="g-cell g-1"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div>
-          <div class="lbl">Phase 2 · Predict<span>Three models, training and evaluation</span></div>
-          <div class="g-cell"></div><div class="g-cell g-2"></div><div class="g-cell g-2"></div><div class="g-cell g-2"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div>
-          <div class="lbl">Phase 3 · Decide<span>Simulator, DQN agent, evaluation, login</span></div>
-          <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell g-3"></div><div class="g-cell g-3"></div><div class="g-cell g-3"></div><div class="g-cell g-3"></div><div class="g-cell"></div><div class="g-cell"></div>
-          <div class="lbl">Phase 4 · Home<span>Documentation, deployment, monitoring</span></div>
-          <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell g-4"></div><div class="g-cell g-4"></div><div class="g-cell g-4"></div><div class="g-cell"></div>
-          <div class="lbl">Final tests &amp; presentation<span>Render, testing, final demo</span></div>
-          <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell g-5"></div><div class="g-cell g-5"></div>
-          </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 6 · References -->
-    <div class="accordion-item">
-      <h3 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#t6" aria-expanded="false" aria-controls="t6">
-          <span class="topic-num">6</span>References
-        </button>
-      </h3>
-      <div id="t6" class="accordion-collapse collapse" data-bs-parent="#topics">
+      <div id="t7" class="accordion-collapse collapse" data-bs-parent="#topics">
         <div class="accordion-body">
           <ol class="refs">
-            <li>Alcaldía Municipal de Chía. (2024). <em>Decreto 279 de 2024 (12 de abril): por el cual se establecen medidas de tránsito vehicular en la Avenida Pradilla, en las vías urbanas y veredales del municipio de Chía</em>.</li>
-            <li>Alcaldía Municipal de Chía. (2025, abril). <em>Chía modifica restricción e implementará pico y placa ambiental para carga pesada</em>. https://chia-cundinamarca.gov.co/web/2025/04/chia-modifica-restriccion-e-implementara-pico-y-placa-ambiental-para-carga-pesada/</li>
-            <li>Breiman, L. (2001). Random forests. <em>Machine Learning, 45</em>(1), 5–32.</li>
-            <li>El Cronista. (2026, 14 de septiembre). <em>Tras más de 12 años, el Gobierno busca ampliar la avenida más caótica del municipio: los viajes tardarán 7 minutos y habrá 8 nuevos carriles</em>. https://www.cronista.com/colombia/actualidad-co/tras-mas-de-12-anos-el-gobierno-busca-ampliar-la-avenida-mas-caotica-del-municipio-los-viajes-tardaran-7-minutos-y-habra-8-nuevos-carriles/</li>
-            <li>Friedman, J. H. (2001). Greedy function approximation: A gradient boosting machine. <em>The Annals of Statistics, 29</em>(5), 1189–1232.</li>
-            <li>Infobae. (2025, 27 de mayo). <em>Pico y placa ambiental: así funcionará la medida de movilidad para transitar por el corredor de Chía-Cota</em>. https://www.infobae.com/colombia/2025/05/27/pico-y-placa-ambiental-asi-funcionara-la-media-de-movilidad-para-transitar-por-el-corredor-de-chia-cota/</li>
-            <li>KDnuggets. (2025). <em>The machine learning lifecycle</em>.</li>
-            <li>MacQueen, J. (1967). Some methods for classification and analysis of multivariate observations. In <em>Proceedings of the Fifth Berkeley Symposium on Mathematical Statistics and Probability</em> (Vol. 1, pp. 281–297). University of California Press.</li>
-            <li>ML-Ops.org. (n.d.). <em>CRISP-ML(Q): The ML lifecycle process</em>.</li>
-            <li>Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A. A., Veness, J., Bellemare, M. G., … Hassabis, D. (2015). Human-level control through deep reinforcement learning. <em>Nature, 518</em>(7540), 529–533.</li>
-            <li>Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. (2019). PyTorch: An imperative style, high-performance deep learning library. In <em>Advances in Neural Information Processing Systems 32</em>.</li>
-            <li>Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., … Duchesnay, É. (2011). Scikit-learn: Machine learning in Python. <em>Journal of Machine Learning Research, 12</em>, 2825–2830.</li>
-            <li>Rumelhart, D. E., Hinton, G. E., &amp; Williams, R. J. (1986). Learning representations by back-propagating errors. <em>Nature, 323</em>(6088), 533–536.</li>
-            <li>Secretaría Distrital de Movilidad de Bogotá. (n.d.). <em>Red semafórica de Bogotá D.C.</em> [Conjunto de datos]. Datos Abiertos Bogotá. https://datosabiertos.bogota.gov.co/dataset/red-semaforica-de-bogota-d-c1</li>
-            <li>Studer, S., Bui, T. B., Drescher, C., Hanuschkin, A., Winkler, L., Peters, S., &amp; Müller, K.-R. (2021). Towards CRISP-ML(Q): A machine learning process model with quality assurance methodology. <em>Machine Learning and Knowledge Extraction, 3</em>(2), 392–413.</li>
-            <li>Sutton, R. S., &amp; Barto, A. G. (2018). <em>Reinforcement learning: An introduction</em> (2nd ed.). MIT Press.</li>
-            <li>Webster, F. V. (1958). <em>Traffic signal settings</em> (Road Research Technical Paper No. 39). Her Majesty’s Stationery Office.</li>
-            <li>Wei, H., Zheng, G., Gayah, V., &amp; Li, Z. (2019). A survey on traffic signal control methods. <em>arXiv preprint</em> arXiv:1904.08117.</li>
+            {% for r in pgc_refs %}<li>{{ r | safe }}</li>
+            {% endfor %}
           </ol>
         </div>
       </div>
@@ -276,11 +282,12 @@
   </div>
 
   <div class="text-center mt-5">
-    <a href="/dashboard" class="btn btn-dark me-2">Go to the dashboard</a>
-    <a href="/simula" class="btn btn-outline-dark">Watch the simulation</a>
+    {% if current_user %}<a href="/app" class="btn btn-dark me-2">Open the workspace</a>{% else %}<a href="/login" class="btn btn-dark me-2">Log in to the system</a>{% endif %}
+    <a href="/user-guide" class="btn btn-outline-dark">Read the user guide</a>
   </div>
-  <p class="home-footer text-center mt-4 mb-0">Built with Flask · scikit-learn · PyTorch · Bootstrap</p>
+  <p class="home-footer text-center mt-4 mb-0">Built with Flask · scikit-learn · PyTorch · PostgreSQL · Bootstrap</p>
 </main>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -21,7 +21,6 @@ Flask application.
 | CRISP-ML evidence | https://smart-traffic-control-9bi4.onrender.com/crisp-ml |
 | User guide | https://smart-traffic-control-9bi4.onrender.com/user-guide |
 | Final technical report | `static/docs/Final_Technical_Report_Smart_Traffic_Control.pdf` (also linked from the homepage) |
-| Presentation video | linked and embedded on the homepage (set `VIDEO_URL`, see below) |
 
 ## Team
 
@@ -139,7 +138,6 @@ and the accounts are created from environment variables (see `.env.example`; no 
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_EMAIL` | first administrator |
 | `TEST_USERS_PASSWORD` | creates `admin_test`, `operator_test` and `viewer_test` with that password |
 | `ERICK_PASSWORD`, `SANTIAGO_PASSWORD`, `IVAN_PASSWORD`, `EDWARD_PASSWORD` | password of `<name>_operator` and `<name>_viewer`; if empty, a default stored only as a hash in `services/seed.py` is used (the passwords are given privately to the instructor) |
-| `VIDEO_URL` | YouTube or Google Drive link of the presentation video, embedded on the homepage |
 | `SESSION_COOKIE_SECURE` | `1` to send the cookie only over HTTPS |
 
 ## Run the application
@@ -198,7 +196,7 @@ training pipeline, outcome recording, logging and data persistence after a resta
 
 `render.yaml` creates the web service and a PostgreSQL database (`smart-traffic-db`) and connects them through
 `DATABASE_URL`. After the first deploy open the service in the Render dashboard and set the secrets
-`ADMIN_USERNAME`, `ADMIN_PASSWORD`, `TEST_USERS_PASSWORD` and, when the video is published, `VIDEO_URL`; `SECRET_KEY` is generated automatically. The service
+`ADMIN_USERNAME`, `ADMIN_PASSWORD` and `TEST_USERS_PASSWORD`; `SECRET_KEY` is generated automatically. The service
 checks `/health`. The saved model is loaded at start-up, so no training is needed on the server. Check the current
 limits of the free plans (the free instance sleeps after inactivity and free databases can expire).
 

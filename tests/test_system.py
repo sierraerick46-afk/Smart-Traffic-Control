@@ -18,17 +18,16 @@ def test_homepage_and_documentation_are_public(client):
     assert client.get("/health").status_code == 200
 
 
-def test_homepage_has_every_resource_link(client):
+def test_homepage_has_every_pgc_section_and_resource(client):
     html = client.get("/").get_data(as_text=True)
-    for resource in ["Technical report", "CRISP-ML evidence", "Repository", "Intelligent system", "User documentation",
-                     "Presentation video"]:
+    for section in ["Project title", "Problem statement and justification", "General objective", "Specific objectives",
+                    "Reference framework", "Methodology and development schedule", "Bibliographic references"]:
+        assert section in html
+    assert "Section under construction" not in html and 'href="/demo"' not in html
+    for resource in ["Technical report", "CRISP-ML evidence", "Repository", "Intelligent system", "User documentation"]:
         assert resource in html
     assert client.get("/user-guide").status_code == 200
 
-
-def test_video_link_is_embedded_when_configured(client, monkeypatch):
-    monkeypatch.setenv("VIDEO_URL", "https://youtu.be/abcdefghijk")
-    assert "https://www.youtube.com/embed/abcdefghijk" in client.get("/").get_data(as_text=True)
 
 
 @pytest.mark.parametrize("url", PROTECTED)
