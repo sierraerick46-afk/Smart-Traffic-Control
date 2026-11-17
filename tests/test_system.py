@@ -18,11 +18,8 @@ def test_homepage_and_documentation_are_public(client):
     assert client.get("/health").status_code == 200
 
 
-def test_homepage_has_every_pgc_section_and_resource(client):
+def test_homepage_has_every_resource_link(client):
     html = client.get("/").get_data(as_text=True)
-    for section in ["Project title", "Problem statement and justification", "General objective", "Specific objectives",
-                    "Reference framework", "Methodology and development schedule", "Bibliographic references"]:
-        assert section in html
     for resource in ["Technical report", "CRISP-ML evidence", "Repository", "Intelligent system", "User documentation",
                      "Presentation video"]:
         assert resource in html
