@@ -74,7 +74,7 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
 .hero h1 { font-weight:600; font-size:clamp(2rem,4.6vw,3.3rem); line-height:1.1; margin-bottom:1rem; }
 .hero .lead { color:#d5dad2; max-width:38rem; }
 .hero .btn-light { color:var(--ink); }
-.phase-chips { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:2.5rem; }
+.phase-chips { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:2.5rem; }
 .phase-chip { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:8px; padding:.9rem 1rem; }
 .phase-chip b { display:block; font-weight:600; }
 .phase-chip span { font-size:.85rem; color:#cfd5cc; }
@@ -125,7 +125,6 @@ body { font-family:"IBM Plex Sans",system-ui,sans-serif; background:var(--paper)
 .refs { padding-left:1.6rem; margin:0; }
 .refs li { margin-bottom:.7rem; padding-left:.2rem; }
 .home-footer { color:#5c666d; font-size:.85rem; }
-@media (max-width:991px) { .phase-chips { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:576px) { .phase-chips { grid-template-columns:1fr; } }
 .app-nav .dropdown-menu { border:1px solid var(--line); border-radius:8px; padding:6px; min-width:300px; }
 .app-nav .dropdown-item { border-radius:6px; font-size:.92rem; padding:.45rem .7rem; color:var(--ink); }
