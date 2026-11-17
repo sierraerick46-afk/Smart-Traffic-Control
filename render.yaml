@@ -31,6 +31,8 @@ services:
         sync: false
       - key: EDWARD_PASSWORD
         sync: false
+      - key: VIDEO_URL
+        sync: false
 
 databases:
   - name: smart-traffic-db

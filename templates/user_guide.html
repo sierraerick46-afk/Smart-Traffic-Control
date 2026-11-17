@@ -1,0 +1,100 @@
+{% with page_title = "User guide" %}{% include "_crisp_head.html" %}{% endwith %}
+
+<header class="crisp-hero">
+  <div class="container">
+    <span class="hero-kicker">User documentation</span>
+    <h1>User guide</h1>
+    <p class="lead mb-0">How to use the system with each role, what the forecast means, how new users are trained and how to report a problem.</p>
+  </div>
+</header>
+
+<main class="container py-5">
+  <nav class="crisp-toc mb-4" aria-label="Contents">
+    <a href="#access">Access</a> · <a href="#viewer">Viewer</a> · <a href="#operator">Operator</a> · <a href="#admin">Administrator</a> ·
+    <a href="#output">Reading the forecast</a> · <a href="#training">Training</a> · <a href="#incidents">Incidents and feedback</a>
+  </nav>
+
+  <section id="access" class="mb-5">
+    <h2 class="section-title h4">Access and roles</h2>
+    <p>The home page, the PGC documentation, the CRISP-ML pages and this guide are public. Everything else needs an account. Create one in <a href="/register">Register</a> (full name, username, email and a password of at least eight characters with letters and numbers). Every new account starts as a <b>viewer</b>; only an administrator can give a higher role. If you open a protected page without logging in, the system sends you to <a href="/login">Log in</a> and then back to the page you asked for.</p>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead><tr><th>Role</th><th>Who</th><th>What they can do</th></tr></thead>
+        <tbody>
+          <tr><td><b>Viewer</b></td><td>Citizen, student or mobility staff who only consults</td><td>See intersections, approved and applied plans and their own indicators; send feedback</td></tr>
+          <tr><td><b>Operator</b></td><td>Traffic technician</td><td>Request forecasts, create and submit timing plans, record the real count, report incidents</td></tr>
+          <tr><td><b>Administrator</b></td><td>Head of the traffic office and of the system</td><td>Approve or reject plans, manage intersections, users and roles, read the monitoring page and decide on retraining</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="viewer" class="mb-5">
+    <h2 class="section-title h4">Viewer</h2>
+    <div class="guide-step">1. Log in. Your role appears next to your name in the menu.</div>
+    <div class="guide-step">2. Open <b>Operations → Intersections</b> to see the four intersections and their map links.</div>
+    <div class="guide-step">3. Open <b>Operations → Timing plans</b> to read the plans that were approved or applied.</div>
+    <div class="guide-step">4. Open <b>Operations → Reports</b> to see the indicators.</div>
+    <div class="guide-step">5. To send a comment, open <b>Operations → Incidents and feedback → New</b>, choose the intersection and describe it.</div>
+  </section>
+
+  <section id="operator" class="mb-5">
+    <h2 class="section-title h4">Operator: from a forecast to a plan</h2>
+    <div class="guide-step">1. Open <b>Operations → New forecast</b>, choose the intersection, the date and the hour, and press <b>Run forecast</b>. The server runs the model and saves the result with your user and the model version.</div>
+    <div class="guide-step">2. Read the forecast (vehicles per hour), the type of moment (off-peak, moderate or peak), the curve of the day and the suggested green time.</div>
+    <div class="guide-step">3. Press <b>Create timing plan</b>. You can move the proposal by up to 15 seconds; a larger change needs a written justification of at least 10 characters. Save the draft.</div>
+    <div class="guide-step">4. Press <b>Submit for approval</b>. When an administrator approves it, press <b>Mark as applied</b>.</div>
+    <div class="guide-step">5. After the hour has passed, open the forecast again and record the real vehicle count in <b>Real outcome</b>. The system calculates the error and uses it in the reports and the monitoring.</div>
+  </section>
+
+  <section id="admin" class="mb-5">
+    <h2 class="section-title h4">Administrator</h2>
+    <div class="guide-step">1. Open a <b>pending</b> plan and approve it, or reject it writing the reason (at least 10 characters).</div>
+    <div class="guide-step">2. Manage intersections from <b>Operations → Intersections</b>: create, edit or disable. An intersection with forecasts or plans cannot be deleted.</div>
+    <div class="guide-step">3. Open <b>Admin → Users and roles</b> to change a role or disable an account. Nobody can change their own role, and at least one active administrator must remain.</div>
+    <div class="guide-step">4. Review <b>Incidents and feedback</b>: assign, change the status and close each one with a resolution.</div>
+    <div class="guide-step">5. Open <b>Admin → Monitoring</b> every week to read the alerts, the live error and the model versions.</div>
+  </section>
+
+  <section id="output" class="mb-5">
+    <h2 class="section-title h4">How to read the forecast</h2>
+    <ul>
+      <li><b>Meaning.</b> The number is the average number of vehicles expected in that hour at that intersection. On the independent test the average error was about 5.6 vehicles per hour.</li>
+      <li><b>Suggested green time.</b> 8 + 52 × min(1, forecast ÷ 95th percentile of the intersection) seconds, always between 8 and 60. It is a proposal: a person adjusts and approves it.</li>
+      <li><b>Dates far from the data.</b> The model learned from November 2015 to June 2017. For dates more than 60 days after that, the page shows a warning and the forecast keeps the last level it learned.</li>
+      <li><b>Less reliable intersections.</b> The forecast is more accurate at intersections 1 and 2 than at 3 and 4.</li>
+      <li><b>Data.</b> The counts are a public dataset assigned to Chía, not field measurements, so the system demonstrates the process.</li>
+    </ul>
+  </section>
+
+  <section id="training" class="mb-5">
+    <h2 class="section-title h4">Training guide</h2>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead><tr><th>Session</th><th>Audience</th><th>Content</th><th>Practice</th><th>Check</th></tr></thead>
+        <tbody>
+          <tr><td>1. Introduction (20 min)</td><td>All</td><td>Purpose, roles, what the forecast means and its limits</td><td>Log in, read the home page, find the role badge</td><td>Explain what an error of 5.6 veh/h means</td></tr>
+          <tr><td>2. Operation (40 min)</td><td>Operators</td><td>Forecasts, green-time rule, plan workflow, real outcomes, incidents</td><td>Create a forecast and a plan, submit it, record the outcome</td><td>A plan reaches pending approval</td></tr>
+          <tr><td>3. Administration (40 min)</td><td>Administrators</td><td>Decisions, users, monitoring, retraining</td><td>Approve and reject plans, change a role, read the alerts, close an incident</td><td>An incident is closed with a resolution</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small text-secondary mb-0">The training is repeated when the business rules or the model change. The presentation video on the <a href="/#video">home page</a> shows the complete workflow.</p>
+  </section>
+
+  <section id="incidents" class="mb-5">
+    <h2 class="section-title h4">Incident reporting and feedback</h2>
+    <ol>
+      <li>Any user opens <b>Operations → Incidents and feedback → New</b>, chooses the intersection, the kind (feedback, incident or model issue) and the severity (low, medium or high), and describes what happened. Viewers can send feedback only.</li>
+      <li>The system registers it as <b>open</b> with the author and the date.</li>
+      <li>An administrator reviews it, changes it to <b>in review</b> and assigns an operator if needed.</li>
+      <li>The assignee investigates. If the cause is the model, the forecast is linked and noted for the next retraining.</li>
+      <li>The administrator or the assignee closes it with a resolution (required); it then appears in the reports.</li>
+    </ol>
+    <p class="small text-secondary mb-0">Incidents are reviewed within one working day. Technical errors are also logged automatically and shown on the monitoring page.</p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -16,6 +16,12 @@ TEAM_ACCOUNTS = {
     "ivan": ("Ivan Felipe Leon Pinilla", "scrypt:32768:8:1$CaiVTLSGKIMRtxlP$a5b55813eb68cba2648fc8ed50e88a317d3c85fe87cca7002d75669d938983442cedb1e3c26f604c98a25c2cf565868eba2ef6b16ee8bda152daf21183a2e794"),
     "edward": ("Edward Felipe Gil Gomez", "scrypt:32768:8:1$krF47v6uGje5BOiA$bfb9d9cc7bdca14a9063b9e6759aa6997514e8bd9ae0121184bc11ab4f2497625bc496353f7fdcea932320c9a2dd8eddd8bd5f81b0499ba2d4895c9d58bad9ce"),
 }
+TEAM_EXTRA_HASHES = {
+    "erick": "scrypt:32768:8:1$QinDU8u26AIgXY3P$4009de33017c522622bea99812e5e6caf42b0fb8986cee3ca543fe5a92ac1bf2084e55bb24057a97bdc822966dfe1ccf79f09d7d746d66a42f468fb448d084b6",
+    "santiago": "scrypt:32768:8:1$gBz9QYwhjfEFsZ0o$2758a1fa945e881854c81f0931a036fd9a4f56d01ca1011d2239ea3d230d36b7b50e90ae507c2fb101e4adf6704b850595320c4e2908e07a8b5ea20b2b3b897f",
+    "ivan": "scrypt:32768:8:1$p5ITciFR5tU1Wvrz$5c7a4794dd447f17f9b0a8c619bf017257bf1c11c9eaf49473a492daf89ad3349694359771eb91943bd2dd1f1371f139d8ad2b342e88e88fd6ecc0388dee17d7",
+    "edward": "scrypt:32768:8:1$C5OA2AmMDtsTlKwa$2c053daa656b0cdbbf53280b77847e8fbf992e1943763132d6b11dd2405d2b736fbf0f7d59a765ea029030d404411b4a1356d6c1ce66e322cbbe639b68b16577",
+}
 TEST_ROLES = ("admin", "operator", "viewer")
 TEAM_EXTRA_ROLES = ("operator", "viewer")
 
@@ -67,11 +73,12 @@ def seed_accounts():
         if not q1("SELECT id FROM users WHERE username = ?", (username,)):
             accounts.create_user(username, full_name, f"{username}@team.local", role="admin", password_hash=pw_hash)
     for username, (full_name, _hash) in TEAM_ACCOUNTS.items():
-        team_pw = os.environ.get(f"{username.upper()}_PASSWORD") or f"{username}12345"
+        team_pw = os.environ.get(f"{username.upper()}_PASSWORD")
         for role in TEAM_EXTRA_ROLES:
             name = f"{username}_{role}"
             if not q1("SELECT id FROM users WHERE username = ?", (name,)):
-                accounts.create_user(name, full_name, f"{username}.{role}@team.local", team_pw, role)
+                accounts.create_user(name, full_name, f"{username}.{role}@team.local", team_pw, role,
+                                     password_hash=None if team_pw else TEAM_EXTRA_HASHES[username])
     admin_user, admin_pw = os.environ.get("ADMIN_USERNAME"), os.environ.get("ADMIN_PASSWORD")
     if admin_user and admin_pw and not q1("SELECT id FROM users WHERE username = ?", (admin_user.lower(),)):
         accounts.create_user(admin_user.lower(), "System Administrator",
