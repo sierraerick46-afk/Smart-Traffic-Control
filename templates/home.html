@@ -54,21 +54,7 @@
         <b>Intelligent system</b><span>Forecasts, timing plans, incidents, intersections and reports. Requires login (administrator, operator or viewer).</span></a></div>
       <div class="col-sm-6 col-lg-4"><a class="res-card" href="/user-guide">
         <b>User documentation</b><span>User manual by role, training guide and the incident and feedback procedure.</span></a></div>
-      <div class="col-sm-6 col-lg-4"><a class="res-card" href="#video">
-        <b>Presentation video</b><span>20-minute presentation in English by the four team members.</span></a></div>
     </div>
-  </section>
-
-  <section class="mb-5" id="video" aria-labelledby="video-title">
-    <h2 id="video-title" class="section-title h3 mb-3">Presentation video</h2>
-    {% if links.video_embed %}
-    <div class="ratio ratio-16x9 video-frame"><iframe src="{{ links.video_embed }}" title="Project presentation video" allowfullscreen></iframe></div>
-    <p class="small mt-2 mb-0"><a href="{{ links.video_url }}" target="_blank" rel="noopener">Open the video in a new tab</a></p>
-    {% elif links.video_url %}
-    <p><a class="btn btn-dark" href="{{ links.video_url }}" target="_blank" rel="noopener">Watch the presentation video</a></p>
-    {% else %}
-    <p class="text-secondary mb-0">The video link will be published here.</p>
-    {% endif %}
   </section>
 
   <div class="mb-4" id="pgc">
@@ -269,7 +255,7 @@
                 <tr><td>6</td><td>Activity R3A2: complete CRISP-ML process (validation by time, five models, test R² ≥ 0.80, monitoring test)</td><td>Edward</td><td>Week 7</td><td>14 Nov 2026</td><td>train.py, monitor.py, model.joblib, CRISP-ML evidence and technical report</td></tr>
                 <tr><td>7</td><td>Deployment on Render</td><td>Santiago</td><td>Week 7</td><td>14 Nov 2026</td><td>Published URL</td></tr>
                 <tr><td>8</td><td>Activity R3A3: information system (database, roles, forecast-to-plan process, incidents, reports, monitoring, tests)</td><td>Ivan</td><td>Week 8</td><td>15 Nov 2026</td><td>Information system, automated tests, operational review and technical report</td></tr>
-                <tr><td>9</td><td>Activity R3A4: PGC documentation, resource links, user guide, final report and presentation video</td><td>Edward (documentation and report) · All (video)</td><td>Week 8</td><td>16 Nov 2026</td><td>This homepage, final technical report and 20-minute video</td></tr>
+                <tr><td>9</td><td>Activity R3A4: PGC documentation, resource links, user guide and final report</td><td>Edward</td><td>Week 8</td><td>16 Nov 2026</td><td>This homepage, user guide and final technical report</td></tr>
               </tbody>
             </table>
           </div>
